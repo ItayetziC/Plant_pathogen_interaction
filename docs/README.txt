@@ -1,25 +1,6 @@
-# [Nombre del proyecto]
+# Análisis de la expresión diferencial entre una bacteria patogénica y planta durante su interacción.
 
-<!--
-AYUDA:
-Escriban el nombre del proyecto. Debe ser breve, específico y fácil de identificar.
-Puede coincidir con el nombre del repositorio.
-
-EJEMPLO:
-# Comparación de genes de resistencia antimicrobiana
--->
-
-[Describan el proyecto en una o dos frases.]
-
-
-Para conocer el planteamiento, las preguntas de investigación, la metodología y
-los resultados, consulta el [reporte del proyecto](docs/reporte-proyecto.md).
-
-<!--
-AYUDA:
-Ajusten la ruta del enlace si el reporte tiene otro nombre o se encuentra en otra
-carpeta. Comprueben que el enlace funcione desde GitHub.
--->
+# Se ubica en https://github.com/ItayetziC/Plant_pathogen_interaction
 
 ## Funcionalidades
 

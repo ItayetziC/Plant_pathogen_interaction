@@ -1,4 +1,4 @@
-# Análisis de la expresión diferencial entre una bacteria patogénica y planta durante su interacción.
+# Análisis transcriptómico diferencial de Pseudomonas syringae durante la infección de Arabidopsis thaliana
 
 # Se ubica en https://github.com/ItayetziC/Plant_pathogen_interaction
 
@@ -22,7 +22,7 @@ EJEMPLO:
 ## Estructura del repositorio
 
 ```text
-proyecto/
+Plant_pathogen_interaction/
 ├── data/           # Datos de ejemplo o archivos pequeños
 ├── docs/           # Reporte y documentación
 ├── notebooks/      # Análisis exploratorios
@@ -149,9 +149,9 @@ EJEMPLO:
 
 ## Equipo
 
-- [Nombre completo] — [Contribución o responsabilidad general]
-- [Nombre completo] — [Contribución o responsabilidad general]
-- [Nombre completo] — [Contribución o responsabilidad general]
+- Andrómeda Coral Gutiérrez — PENDIENTE
+- Itayetzi Corona Aquino — PENDIENTE
+- Leilani Cruz Ramírez — PENDIENTE
 
 <!--
 AYUDA:
@@ -181,7 +181,7 @@ La forma recomendada de citar la versión v1.0.0 se encuentra en CITATION.cff.
 
 ## Licencia
 
-[Indiquen el nombre de la licencia.] Consulta [LICENSE](LICENSE) para conocer
+El código se distribuye bajo la licencia MIT. Consulta el [LICENSE](https://github.com/ItayetziC/Plant_pathogen_interaction/blob/main/LICENSE) para conocer
 los términos de uso.
 
 <!--

@@ -9,7 +9,7 @@ Escherichia coli. -->
 | Dato | Información |
 |:--|:--|
 | Integrante 1 | Itayetzi Corona Aquino itayetzi@lcg.unam.mx |
-| Integrante 2 | [Nombre completo y correo] |
+| Integrante 2 | Leilani Cruz Ramírez leilanic@lcg.unam.mx |
 | Integrante 3 | [Nombre completo y correo] |
 | Fecha de creación | 25/08/2026 |
 | Última actualización | [dd/mm/aaaa] |
@@ -118,7 +118,10 @@ ser alcanzable durante el semestre.
 EJEMPLO: Desarrollar un flujo reproducible en Python para identificar y comparar
 genes de resistencia en un conjunto de genomas de E. coli. -->
 
-[Escriban aquí el objetivo general.]
+Identificar y caracterizar los genes diferencialmente expresados de Pseudomonas syringae 
+pv.tomato DC3000 durante la infección de Arabidopsis thaliana, en comparación con condiciones
+de crecimiento no infectivas, para determinar las funciones biológicas asociadas con la 
+interacción bacteria-hospedero.
 
 
 ## 5. Preguntas de investigación
@@ -131,13 +134,35 @@ de presencia y ausencia obtenida de las anotaciones. -->
 
 ### Pregunta 1
 
-**Pregunta:** [Escriban la pregunta.]  
-**Evidencia necesaria:** [Datos o resultados que permitirán responderla.]
+**Pregunta:** ¿Qué genes de Pseudomonas syringae pv.tomato DC3000 presentan cambios 
+significativos en su expresión durante la infección de Arabidopsis thaliana en comparación 
+con condiciones de crecimiento no infectadas?  
+
+**Evidencia necesaria:** Matriz de expresión génica y réplicas experimentales de ambas condiciones,
+a partir de las cuales se obtenga una tabla de genes diferencialmente expresados con sus valores 
+y significancia. Los resultados podrán visualizarse mediante un volcano plot y un heatmap.
+
 
 ### Pregunta 2
 
-**Pregunta:** [Escriban la pregunta.]  
-**Evidencia necesaria:** [Datos o resultados que permitirán responderla.]
+**Pregunta:** ¿Qué funciones biológicas y procesos asociados con la adaptación al hospedero y la 
+patogénesis están representados entre los genes diferencialmente expresados durante la infección?
+
+**Evidencia necesaria:** Anotación funcional de los genes diferencialmente expresados y clasificación 
+de estos según sus funciones, particularmente aquellas relacionadas con secreción y efectores, 
+transporte y adquisición de nutrientes, regulación, adhesión, respuesta al estrés y otros mecanismos 
+asociados con la virulencia.
+
+### Pregunta 3
+
+**Pregunta:** ¿Existen genes diferencialmente expresados durante la infección cuya función se 
+encuentre poco caracterizada o sea desconocida y que, por su patrón de expresión, puedan 
+considerarse candidatos para estudios posteriores de la interacción bacteria-hospedero?
+
+**Evidencia necesaria:** Identificación de genes diferencialmente expresados con anotaciones 
+de función desconocida, hipotética o conservada, considerando su magnitud de cambio 
+de expresión y significancia estadística.
+
 
 ## 6. Alcance y limitaciones
 

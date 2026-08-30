@@ -1,4 +1,4 @@
-# [Nombre del proyecto]
+# Análisis transcriptómico diferencial de Pseudomonas syringae durante la infección de Arabidopsis thaliana
 
 <!-- AYUDA: Escriban un título breve, específico y descriptivo. Puede ser provisional.
 EJEMPLO: Comparación de genes de resistencia antimicrobiana en genomas de
@@ -8,12 +8,12 @@ Escherichia coli. -->
 
 | Dato | Información |
 |:--|:--|
-| Integrante 1 | [Nombre completo y correo] |
+| Integrante 1 | Itayetzi Corona Aquino itayetzi@lcg.unam.mx |
 | Integrante 2 | [Nombre completo y correo] |
 | Integrante 3 | [Nombre completo y correo] |
-| Fecha de creación | [dd/mm/aaaa] |
+| Fecha de creación | 25/08/2026 |
 | Última actualización | [dd/mm/aaaa] |
-| Repositorio | [URL] |
+| Repositorio | https://github.com/ItayetziC/Plant_pathogen_interaction |
 
 <!-- AYUDA: Mantengan actualizados el estado, la fecha y la versión. La versión
 debe coincidir con una etiqueta de Git cuando exista una entrega identificable. -->
@@ -39,7 +39,44 @@ EJEMPLO: La resistencia antimicrobiana es un problema de salud pública. Aunque
 existen bases especializadas, comparar varios genomas requiere integrar datos
 procedentes de distintos archivos. -->
 
-[Describan aquí el contexto y los antecedentes.]
+Pseudomonas syringae pv.tomato DC3000 es una bacteria Gram-negativa patógena que infecta 
+tanto al tomate como a la planta modelo Arabidopsis thaliana, lo que la ha convertido en
+un sistema de referencia más estudiados para descifrar los mecanismos moleculares de la 
+patogénesis bacteriana y la inmunidad vegetal (1,2).
+
+La bacteria para infectar a la planta ingresa a la hoja por los estomas, suprime la 
+inmunidad vegetal para poder multiplicarse en el apoplasto y convertirlo en acuoso 
+(inundación del espacio intercelular) para absorber nutrientes (2,3). 
+
+El control transcripcional del proceso de infección ha sido ampliamente estudiado para 
+comprender la red de genes virulentos, descritos gracias a la secuenciación completa del 
+genoma de DC3000 que también reveló un cromosoma de 6.4 Mb y dos plásmidos que codifican 
+5,763 marcos de lectura abierta, entre ellos 298 genes de virulencia establecidos y 
+putativos (4). 
+
+El programa transcripcional que la bacteria despliega realmente dentro del hospedero permanece
+menos caracterizado ya que en tejido vegetal infectado el ARN bacteriano representa una fracción 
+mínima del ARN total, dominado por los transcritos de la planta, sin embargo, en 2018 Nobori et al. 
+(5) desarrollaron métodos de enriquecimiento que permitieron superar este obstáculo y 
+generaron el transcriptoma de DC3000 durante la infección de A. thaliana, depositado públicamente 
+como GSE103442.
+
+En este proyecto se realizará un análisis de expresión génica diferencial utilizando el 
+conjunto de datos antes de Buell et al., (2003) y Nobori et al., (2018) para comparar 
+estadísticamente la cantidad de ARN producido por los genes, es decir su expresión, en dos 
+condiciones distintas: durante la infección a A. thaliana y en condiciones no infectivas 
+(crecimiento en medio de cultivo) (4,5). 
+
+Apriximadamente 658 estaban anotados como proteínas hipotéticas, lo que sugiere que una cantidad 
+considerable de genes durante la infección carece de función asignada (Nobori et al., 2018), de modo
+que se podrían identificar cambios de expresión cuyo significado biológico permanece indeterminado.
+
+El análisis se implementará en Python con PyDESeq2 (6), y la anotación funcional de los genes 
+se construirá con Biopython a partir de los registros GenBank del genoma (AE016853–AE016855). 
+El resultado principal será una tabla de genes diferencialmente expresados con su magnitud de 
+cambio (7) y su significancia estadística corregida, representada visualmente mediante un heatmap 
+y un volcano plot (8).
+
 
 ## 2. Planteamiento del problema
 
@@ -49,7 +86,21 @@ problema con la herramienta ni con la solución.
 EJEMPLO: La identificación manual de genes de resistencia en varios genomas es
 lenta, propensa a errores y difícil de reproducir. -->
 
-[Describan aquí el problema.]
+
+Pseudomonas syringae pv. tomato DC3000 causa la mancha bacteriana del tomate, una enfermedad de 
+importancia económica mundial para la cual aún no existen medidas de control efectivas (4). 
+Diseñarlas requiere saber qué genes utiliza la bacteria durante la infección real, pero buena parte 
+de lo que se conoce sobre la regulación de su virulencia proviene de experimentos en medios de cultivo, 
+que no reproducen las condiciones del apoplasto. Además solo el 61% de sus 5763 genes tiene función 
+asignada.
+
+Los datos transcriptómicos necesarios para reducir este vacío ya son públicos, pero permanecen subutilizados. 
+Se trata de matrices de miles de genes por decenas de muestras, donde cada gen aparece solo como un 
+identificador numérico. Determinar cuáles cambian de forma significativa exige un tratamiento estadístico 
+que considere la variabilidad entre réplicas y el elevado número de comparaciones simultáneas, e 
+interpretarlos requiere vincular cada identificador con la función de su producto, almacenada en una 
+base de datos independiente. Mientras esa información no se procese, los genes candidatos que se prioricen 
+para estudios funcionales podrían no ser los que realmente operan durante la infección.
 
 ## 3. Justificación
 
@@ -292,10 +343,14 @@ EJEMPLO: Blattner, F. R. et al. (1997). The complete genome sequence of
 Escherichia coli K-12. Science, 277(5331), 1453–1462.
 https://doi.org/10.1126/science.277.5331.1453 -->
 
-1. [Referencia 1]
-2. [Referencia 2]
-
-
+1. Shao, X., Tan, M., Xie, Y., Yao, C., Wang, T., Huang, H., Zhang, Y., Ding, Y., Liu, J., Han, L., Hua, C., Wang, X., & Deng, X. (2021). Integrated regulatory network in Pseudomonas syringae reveals dynamics of virulence. Cell Reports, 34(13), 108920. 10.1016/j.celrep.2021.108920
+2. Helmann, T. C., Deutschbauer, A. M., & Lindow, S. E. (2019). Genome-wide identification of Pseudomonas syringae genes required for fitness during colonization of the leaf surface and apoplast. Proceedings of the National Academy of Sciences (PNAS), 116(38), 18900–18910. 10.1073/pnas.1908858116
+3. Xin, X.-F., Kvitko, B., & He, S. Y. (2018). Pseudomonas syringae: what it takes to be a pathogen. Nature Reviews Microbiology, 16(5), 316–328.10.1038/nrmicro.2018.17
+4. Buell, C. R., Joardar, V., Lindeberg, M., Selengut, J., Paulsen, I. T., Gwinn, M. L., Dodson, R. J., Deboy, R. T., Durkin, A. S., Kolonay, J. F., Madupu, R., Daugherty, S., Brinkac, L., Beanan, M. J., Haft, D. H., Nelson, W. C., Zafar, N., Zhou, L., Liu, J., Yuan, Q., Khouri, H., Fedorova, N., Tran, B., Russell, D., Berry, K., Utterback, T., Van Aken, S. E., Feldblyum, T. V., D'Ascenzo, M., Deng, W.-L., Ramos, A. R., Alfano, J. R., Chatterjee, A. K., Delaney, T. P., Lazarowitz, S. G., Martin, G. B., Schneider, D. J., Tang, X., Bender, C. L., White, O., Fraser, C. M., & Collmer, A. (2003). The complete genome sequence of the Arabidopsis and tomato pathogen Pseudomonas syringae pv. tomato DC3000. Proceedings of the National Academy of Sciences (PNAS), 100(17), 10181–10186. 10.1073/pnas.1733273100
+5. Nobori T., Velasquez A. C., Wu J., Kvitko B. H., Kremer J. M., Wang Y., He S. Y. and Tsuda K.(2018). Transcriptome landscape of a bacterial pathogen under plant immunity. Proc Natl Acad Sci U S A 115(13): E3055-E3064. 10.1073/pnas.180052911
+6. Muzellec, B., Telenczuk, M., Cabeli, V., & Andreux, M. (2023). PyDESeq2: a python package for bulk RNA-seq differential expression analysis. Bioinformatics, 39(9), btad547. 10.1093/bioinformatics/btad547
+7. Cock, P. A., et al. (2009). Biopython: freely available Python tools for computational molecular biology and bioinformatics. Bioinformatics, 25(11), 1422–1423. 10.1093/bioinformatics/btp163 
+8. Waskom, M. L. (2021). seaborn: statistical data visualization. Journal of Open Source Software, 6(60), 3021. 10.21105/joss.03021
 ---
 
 <!-- ORIENTACIÓN PARA LAS DOS PRIMERAS SESIONES:

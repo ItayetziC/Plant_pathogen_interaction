@@ -62,7 +62,7 @@ generaron el transcriptoma de DC3000 durante la infección de A. thaliana, depos
 como GSE103442.
 
 En este proyecto se realizará un análisis de expresión génica diferencial utilizando el 
-conjunto de datos antes de Buell et al., (2003) y Nobori et al., (2018) para comparar 
+conjunto de datasets de Buell et al., (2003) y Nobori et al., (2018) para comparar 
 estadísticamente la cantidad de ARN producido por los genes, es decir su expresión, en dos 
 condiciones distintas: durante la infección a A. thaliana y en condiciones no infectivas 
 (crecimiento en medio de cultivo) (4,5). 
@@ -92,15 +92,8 @@ importancia económica mundial para la cual aún no existen medidas de control e
 Diseñarlas requiere saber qué genes utiliza la bacteria durante la infección real, pero buena parte 
 de lo que se conoce sobre la regulación de su virulencia proviene de experimentos en medios de cultivo, 
 que no reproducen las condiciones del apoplasto. Además solo el 61% de sus 5763 genes tiene función 
-asignada.
+asignada, por lo que son necesarios más anáisis para comprender su mecanismo completo de patogenicidad.
 
-Los datos transcriptómicos necesarios para reducir este vacío ya son públicos, pero permanecen subutilizados. 
-Se trata de matrices de miles de genes por decenas de muestras, donde cada gen aparece solo como un 
-identificador numérico. Determinar cuáles cambian de forma significativa exige un tratamiento estadístico 
-que considere la variabilidad entre réplicas y el elevado número de comparaciones simultáneas, e 
-interpretarlos requiere vincular cada identificador con la función de su producto, almacenada en una 
-base de datos independiente. Mientras esa información no se procese, los genes candidatos que se prioricen 
-para estudios funcionales podrían no ser los que realmente operan durante la infección.
 
 ## 3. Justificación
 
@@ -109,7 +102,14 @@ relevancia biológica, científica, técnica o social y quién podría beneficia
 EJEMPLO: Un flujo automatizado reducirá errores y permitirá repetir el análisis
 con los mismos datos, parámetros y versiones del software. -->
 
-[Justifiquen aquí el proyecto.]
+Pseudomonas es la causante de más de 50 tipos de enfermedades en diferentes cultivos que afectan 
+tanto económicamente como socialmente en todo el mundo. 
+Además, aún no existe una estrategia biotecnológica para controlar esta bacteria ni se conocen todos 
+los genes involucrados en su patogenicidad que podrían ser clave para su desarrollo. 
+Aunque los datos transcriptómicos necesarios para reducir este vacío ya son públicos, aún permanecen 
+subutilizados y determinar cuáles cambian de forma significativa podría elucidar genes candidatos que 
+se prioricen para estudios funcionales que cambien dependiendo de su expresión al infectar a la planta 
+modelo A. thaliana.
 
 ## 4. Objetivo general
 
@@ -118,7 +118,7 @@ ser alcanzable durante el semestre.
 EJEMPLO: Desarrollar un flujo reproducible en Python para identificar y comparar
 genes de resistencia en un conjunto de genomas de E. coli. -->
 
-Identificar y caracterizar los genes diferencialmente expresados de Pseudomonas syringae 
+Identificar y cuantificar la expresión de los genes de Pseudomonas syringae 
 pv.tomato DC3000 durante la infección de Arabidopsis thaliana, en comparación con condiciones
 de crecimiento no infectivas, para determinar las funciones biológicas asociadas con la 
 interacción bacteria-hospedero.

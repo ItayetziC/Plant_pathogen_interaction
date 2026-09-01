@@ -1,4 +1,4 @@
-# Análisis transcriptómico diferencial de Pseudomonas syringae durante la infección de Arabidopsis thaliana
+# Análisis transcriptómico diferencial de *Pseudomonas syringae* durante la infección de *Arabidopsis thaliana*
 
 <!-- AYUDA: Escriban un título breve, específico y descriptivo. Puede ser provisional.
 EJEMPLO: Comparación de genes de resistencia antimicrobiana en genomas de
@@ -12,7 +12,7 @@ Escherichia coli. -->
 | Integrante 2 | Leilani Cruz Ramírez leilanic@lcg.unam.mx |
 | Integrante 3 | Andrómeda Coral Gutiérrez andcoral@lcg.unam.mx |
 | Fecha de creación | 25/08/2026 |
-| Última actualización | [30/08/2026] |
+| Última actualización | 01/09/2026 |
 | Repositorio | https://github.com/ItayetziC/Plant_pathogen_interaction |
 
 <!-- AYUDA: Mantengan actualizados el estado, la fecha y la versión. La versión
@@ -39,13 +39,13 @@ EJEMPLO: La resistencia antimicrobiana es un problema de salud pública. Aunque
 existen bases especializadas, comparar varios genomas requiere integrar datos
 procedentes de distintos archivos. -->
 
-Pseudomonas syringae pv.tomato DC3000 es una bacteria Gram-negativa patógena que infecta 
-tanto al tomate como a la planta modelo Arabidopsis thaliana, lo que la ha convertido en
-un sistema de referencia más estudiados para descifrar los mecanismos moleculares de la 
+*Pseudomonas syringae* pv.*tomato* DC3000 es una bacteria Gram-negativa patógena que infecta 
+tanto al tomate como a la planta modelo *Arabidopsis thaliana*, lo que la ha convertido en
+uno de los sistemas de referencia más estudiados para descifrar los mecanismos moleculares de la 
 patogénesis bacteriana y la inmunidad vegetal (1,2).
 
-La bacteria para infectar a la planta ingresa a la hoja por los estomas, suprime la 
-inmunidad vegetal para poder multiplicarse en el apoplasto y convertirlo en acuoso 
+Para infectar a la planta, la bacteria ingresa a la hoja por los estomas, suprime la 
+inmunidad vegetal para poder multiplicarse en el apoplasto y convertirlo en un medio acuoso 
 (inundación del espacio intercelular) para absorber nutrientes (2,3). 
 
 El control transcripcional del proceso de infección ha sido ampliamente estudiado para 
@@ -55,20 +55,20 @@ genoma de DC3000 que también reveló un cromosoma de 6.4 Mb y dos plásmidos qu
 putativos (4). 
 
 El programa transcripcional que la bacteria despliega realmente dentro del hospedero permanece
-menos caracterizado ya que en tejido vegetal infectado el ARN bacteriano representa una fracción 
-mínima del ARN total, dominado por los transcritos de la planta, sin embargo, en 2018 Nobori et al. 
+menos caracterizado. Esto se debe a que, en tejido vegetal infectado, el ARN bacteriano representa una fracción 
+mínima del ARN total, el cual está dominado por los transcritos de la planta. Sin embargo, en 2018 Nobori et al. 
 (5) desarrollaron métodos de enriquecimiento que permitieron superar este obstáculo y 
-generaron el transcriptoma de DC3000 durante la infección de A. thaliana, depositado públicamente 
+generaron el transcriptoma de DC3000 durante la infección de *A. thaliana*, depositado públicamente 
 como GSE103442.
 
 En este proyecto se realizará un análisis de expresión génica diferencial utilizando el 
 conjunto de datasets de Buell et al., (2003) y Nobori et al., (2018) para comparar 
-estadísticamente la cantidad de ARN producido por los genes, es decir su expresión, en dos 
-condiciones distintas: durante la infección a A. thaliana y en condiciones no infectivas 
+estadísticamente la cantidad de ARN producido por los genes (su nivel de expresión) en dos 
+condiciones distintas: durante la infección a *A. thaliana* y en condiciones no infectivas 
 (crecimiento en medio de cultivo) (4,5). 
 
-Apriximadamente 658 estaban anotados como proteínas hipotéticas, lo que sugiere que una cantidad 
-considerable de genes durante la infección carece de función asignada (Nobori et al., 2018), de modo
+Aproximadamente 658 genes estaban anotados como proteínas hipotéticas, lo que sugiere que una cantidad 
+considerable de genes activos durante la infección carece de función asignada (Nobori et al., 2018). De modo
 que se podrían identificar cambios de expresión cuyo significado biológico permanece indeterminado.
 
 El análisis se implementará en Python con PyDESeq2 (6), y la anotación funcional de los genes 
@@ -87,11 +87,11 @@ EJEMPLO: La identificación manual de genes de resistencia en varios genomas es
 lenta, propensa a errores y difícil de reproducir. -->
 
 
-Pseudomonas syringae pv. tomato DC3000 causa la mancha bacteriana del tomate, una enfermedad de 
+*Pseudomonas syringae* pv. *tomato* DC3000 causa la mancha bacteriana del tomate, una enfermedad de 
 importancia económica mundial para la cual aún no existen medidas de control efectivas (4). 
-Diseñarlas requiere saber qué genes utiliza la bacteria durante la infección real, pero buena parte 
+Diseñarlas requiere saber qué genes utiliza la bacteria durante la infección real; sin embargo, buena parte 
 de lo que se conoce sobre la regulación de su virulencia proviene de experimentos en medios de cultivo, 
-que no reproducen las condiciones del apoplasto. Además solo el 61% de sus 5763 genes tiene función 
+los cuales no reproducen las condiciones del apoplasto. Además; solo el 61% de sus 5763 genes tiene una función 
 asignada, por lo que son necesarios más anáisis para comprender su mecanismo completo de patogenicidad.
 
 
@@ -102,14 +102,12 @@ relevancia biológica, científica, técnica o social y quién podría beneficia
 EJEMPLO: Un flujo automatizado reducirá errores y permitirá repetir el análisis
 con los mismos datos, parámetros y versiones del software. -->
 
-Pseudomonas es la causante de más de 50 tipos de enfermedades en diferentes cultivos que afectan 
-tanto económicamente como socialmente en todo el mundo. 
+*Pseudomonas* es la causante de más de 50 tipos de enfermedades en diferentes cultivos, las cuales tienen un gran impacto tanto económico como social en todo el mundo. 
 Además, aún no existe una estrategia biotecnológica para controlar esta bacteria ni se conocen todos 
 los genes involucrados en su patogenicidad que podrían ser clave para su desarrollo. 
-Aunque los datos transcriptómicos necesarios para reducir este vacío ya son públicos, aún permanecen 
-subutilizados y determinar cuáles cambian de forma significativa podría elucidar genes candidatos que 
-se prioricen para estudios funcionales que cambien dependiendo de su expresión al infectar a la planta 
-modelo A. thaliana.
+Aunque los datos transcriptómicos necesarios para reducir este vacío ya son públicos, continúan 
+subutilizados. Determinar cuáles genes cambian de forma significativa permitiría elucidar genes candidatos para priorizar en estudios funcionales, según su variación de expresión al infectar a la planta 
+modelo *A. thaliana*.
 
 ## 4. Objetivo general
 
@@ -118,8 +116,8 @@ ser alcanzable durante el semestre.
 EJEMPLO: Desarrollar un flujo reproducible en Python para identificar y comparar
 genes de resistencia en un conjunto de genomas de E. coli. -->
 
-Identificar y cuantificar la expresión de los genes de Pseudomonas syringae 
-pv.tomato DC3000 durante la infección de Arabidopsis thaliana, en comparación con condiciones
+Identificar y cuantificar la expresión de los genes de *Pseudomonas syringae* 
+pv.*tomato* DC3000 durante la infección de *Arabidopsis thaliana*, en comparación con condiciones
 de crecimiento no infectivas, para determinar las funciones biológicas asociadas con la 
 interacción bacteria-hospedero.
 
@@ -134,8 +132,8 @@ de presencia y ausencia obtenida de las anotaciones. -->
 
 ### Pregunta 1
 
-**Pregunta:** ¿Qué genes de Pseudomonas syringae pv.tomato DC3000 presentan cambios 
-significativos en su expresión durante la infección de Arabidopsis thaliana en comparación 
+**Pregunta:** ¿Qué genes de *Pseudomonas syringae* pv.*tomato* DC3000 presentan cambios 
+significativos en su expresión durante la infección de *Arabidopsis thaliana* en comparación 
 con condiciones de crecimiento no infectadas?  
 
 **Evidencia necesaria:** Matriz de expresión génica y réplicas experimentales de ambas condiciones,
@@ -175,20 +173,20 @@ utilizarán datos clínicos ni se realizará validación experimental. -->
 
 - **Análisis bioinformático** (Control de calidad de datos, cuantificación de la expresión génica)
 - **Muestras y datos:** Datos secundarios de RNA-seq (Serie GEO `GSE103442` / BioProject `PRJNA419365`, 
-Nobori et al., 2018) que abarcan condiciones de infección (_in planta_) frente a controles de 
-crecimiento no infectivo (_in vitro_).
+Nobori et al., 2018) que abarcan condiciones de infección (*in planta*) frente a controles de 
+crecimiento no infectivo (*in vitro*).
 - **Genoma de referencia:** Ensamblado de RefSeq `GCF_000007805.1` para el alineamiento y anotación 
 funcional de la bacteria.
 
 ### No incluye
 
-- **Validación experimental** (Ensayos de laboratorio (_wet-lab_), como RT-qPCR, mutagénesis ni infecciones 
-_in vivo_).
-- **Otras cepas u organismos:** No se evaluarán otras cepas de _P. syringae_ ni otros patógenos u 
+- **Validación experimental** (Ensayos de laboratorio (*wet-lab*), como RT-qPCR, mutagénesis ni infecciones 
+*in vivo*).
+- **Otras cepas u organismos:** No se evaluarán otras cepas de *P. syringae* ni otros patógenos u 
 hospederos alternativos.    
 -   **Transcriptómica del hospedero:** No se caracterizará la respuesta transcripcional de 
-_Arabidopsis thaliana_, enfocándose únicamente en el transcriptoma bacteriano.
--   **Secuenciación de nuevo (_de novo_):** No se generarán datos de secuenciación propios ni se 
+*Arabidopsis thaliana*, enfocándose únicamente en el transcriptoma bacteriano.
+-   **Secuenciación de nuevo (*de novo*):** No se generarán datos de secuenciación propios ni se 
 realizará ensamblado _de novo_.
 
 ### Limitaciones conocidas
@@ -228,8 +226,8 @@ EJEMPLO: NCBI RefSeq, GCF_000005845.2, consultado el dd/mm/aaaa. -->
 
 | Fuente | Identificador o versión | URL | Fecha de consulta | Licencia o condiciones |
 |:--|:--|:--|:--|:--|
-| NCBI Assembly / RefSeq (NCBI / NIH) | Genoma de referencia _Pseudomonas syringae_ pv. _tomato_ DC3000	`GCF_000007805.1` (NC_004578.1) |	[https://www.ncbi.nlm.nih.gov/assembly/29388](https://www.ncbi.nlm.nih.gov/assembly/29388)	|	30/08/2026	|	Dominio Público. Uso libre para investigación académica y comercial.
-| NCBI GEO (Gene Expression Omnibus)	|	Datos de RNA-seq de _P. syringae_ DC3000 (_in planta_ vs. _in vitro_) Serie GEO: `GSE103442` (BioProject: `PRJNA401390`)	|	https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE103442	|	30/08/2026	|	Datos de acceso abierto. Reutilización libre citando la publicación de Nobori et al. (2018).
+| NCBI Assembly / RefSeq (NCBI / NIH) | Genoma de referencia *Pseudomonas syringae* pv. *tomato* DC3000	`GCF_000007805.1` (NC_004578.1) |	[https://www.ncbi.nlm.nih.gov/assembly/29388](https://www.ncbi.nlm.nih.gov/assembly/29388)	|	30/08/2026	|	Dominio Público. Uso libre para investigación académica y comercial.
+| NCBI GEO (Gene Expression Omnibus)	|	Datos de RNA-seq de *P. syringae* DC3000 (*in planta* vs. *in vitro*) Serie GEO: `GSE103442` (BioProject: `PRJNA401390`)	|	https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE103442	|	30/08/2026	|	Datos de acceso abierto. Reutilización libre citando la publicación de Nobori et al. (2018).
 
 ### 8.2 Características de los datos
 
@@ -237,8 +235,8 @@ EJEMPLO: NCBI RefSeq, GCF_000005845.2, consultado el dd/mm/aaaa. -->
 atributos necesarios para interpretar los datos.
 EJEMPLO: Archivos FASTA y GFF3 de 20 genomas completos de E. coli. -->
 
-**1. Genoma de referencia de _Pseudomonas syringae_**
--   **Organismo:** _Pseudomonas syringae_ pv. _tomato_ (cepa DC3000).
+**1. Genoma de referencia de *Pseudomonas syringae***
+-   **Organismo:** *Pseudomonas syringae* pv. *tomato* (cepa DC3000).
 -   **Muestras / Tipo de datos:** Genoma bacteriano completo de referencia y su anotación funcional. 
 -   **Variables / Atributos:** Secuencia completa de nucleótidos del cromosoma bacteriano 
 (~6.39 Mb, ~5,600 genes codificantes de proteínas) y sus plásmidos asociados (pDC3000A y pDC3000B). 
@@ -249,21 +247,21 @@ en formato **GFF3** (`.gff`) o **GTF**.
 `NC_004578.1`).
 -   **Tamaño:** ~2.0 MB comprimido (`.gz`).
 
-**2.  Descripción de los datos transcriptómicos de _Pseudomonas syringae_**
+**2.  Descripción de los datos transcriptómicos de *Pseudomonas syringae***
 
--   **Organismo:** _Pseudomonas syringae_ pv. _tomato_ (cepa DC3000).
+-   **Organismo:** *Pseudomonas syringae* pv. *tomato* (cepa DC3000).
 -   **Muestras:** Muestras de ARN bacteriano extraído directamente de dos condiciones experimentales:
-    1.  _In planta:_ Bacterias aisladas o recolectadas del apoplasto de _Arabidopsis thaliana_ 
+    1.  *In planta:* Bacterias aisladas o recolectadas del apoplasto de *Arabidopsis thaliana* 
     durante el proceso de infección.
-    2.  _In vitro:_ Bacterias cultivadas en medio sintético de laboratorio (condición control/no infectiva).
+    2.  *In vitro:* Bacterias cultivadas en medio sintético de laboratorio (condición control/no infectiva).
 -   **Variables / Atributos:** Niveles de abundancia de transcritos de ARN (expresión génica bacteriana) 
 en respuesta al entorno del hospedero. Mide la cantidad de lecturas mapeadas por gen bacteriano para 
 comparar la activación de factores de virulencia, efectores y metabolismo adaptativo.
 -   **Formatos:**
-    -   **Datos procesados:** Matriz de conteos (_read counts table_) en texto plano delimitado 
+    -   **Datos procesados:** Matriz de conteos (*read counts table*) en texto plano delimitado 
     por tabuladores (`.txt` o `.tsv` comprimido en `.gz`), con filas representando IDs de genes de 
     DC3000 y columnas representando las réplicas biológicas.
-    -   **Datos brutos:** Archivos de secuenciación de alto rendimiento (_Illumina_) en formato 
+    -   **Datos brutos:** Archivos de secuenciación de alto rendimiento (*Illumina*) en formato 
     **FASTQ** comprimido (`.fastq.gz`) almacenados en SRA.
 -   **Versión:** Serie GEO `GSE103442` (Estudio de Nobori et al., 2018).
 -   **Tamaño:** ~5–15 MB para la tabla de datos procesados/conteos; varios Gigabytes (~10–30 GB) 

@@ -343,7 +343,9 @@ EJEMPLO: Ana desarrolla la descarga y revisa el módulo de visualización. -->
 
 | Integrante | Responsabilidad principal | Responsabilidad de revisión |
 |:--|:--|:--|
-| [Nombre] | [Responsabilidad] | [Qué o a quién revisará] |
+|   Itayetzi Corona Aquino  |   [Responsabilidad] | [Qué o a quién revisará] |
+|   Leilani Cruz Ramírez    |   [Responsabilidad] | [Qué o a quién revisará] |
+|   Andrómeda Coral Gutiérrez   |      [Responsabilidad] | [Qué o a quién revisará] |
 
 ### 10.2 Riesgos y alternativas
 

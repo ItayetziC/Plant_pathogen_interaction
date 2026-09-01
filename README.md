@@ -1,6 +1,6 @@
 # Análisis transcriptómico diferencial de Pseudomonas syringae durante la infección de Arabidopsis thaliana
 
-# Se ubica en https://github.com/ItayetziC/Plant_pathogen_interaction
+# Se ubica en [Plant_pathogen_interaction](https://github.com/ItayetziC/Plant_pathogen_interaction)
 
 ## Funcionalidades
 

@@ -1,4 +1,4 @@
-# Análisis transcriptómico diferencial de Pseudomonas syringae durante la infección de Arabidopsis thaliana
+# Análisis transcriptómico diferencial de *Pseudomonas syringae* durante la infección de *Arabidopsis thaliana*
 
 <!-- AYUDA: Escriban un título breve, específico y descriptivo. Puede ser provisional.
 EJEMPLO: Comparación de genes de resistencia antimicrobiana en genomas de
@@ -12,7 +12,7 @@ Escherichia coli. -->
 | Integrante 2 | Leilani Cruz Ramírez leilanic@lcg.unam.mx |
 | Integrante 3 | Andrómeda Coral Gutiérrez andcoral@lcg.unam.mx |
 | Fecha de creación | 25/08/2026 |
-| Última actualización | [30/08/2026] |
+| Última actualización | 01/09/2026 |
 | Repositorio | https://github.com/ItayetziC/Plant_pathogen_interaction |
 
 <!-- AYUDA: Mantengan actualizados el estado, la fecha y la versión. La versión
@@ -52,7 +52,7 @@ El control transcripcional del proceso de infección ha sido ampliamente estudia
 comprender la red de genes virulentos, descritos gracias a la secuenciación completa del 
 genoma de DC3000 que también reveló un cromosoma de 6.4 Mb y dos plásmidos que codifican 
 5,763 marcos de lectura abierta, entre ellos 298 genes de virulencia establecidos y 
-putativos (4). 
+putativos [4]. 
 
 El programa transcripcional que la bacteria despliega realmente dentro del hospedero permanece
 menos caracterizado ya que en tejido vegetal infectado el ARN bacteriano representa una fracción 
@@ -71,11 +71,11 @@ Apriximadamente 658 estaban anotados como proteínas hipotéticas, lo que sugier
 considerable de genes durante la infección carece de función asignada (Nobori et al., 2018), de modo
 que se podrían identificar cambios de expresión cuyo significado biológico permanece indeterminado.
 
-El análisis se implementará en Python con PyDESeq2 (6), y la anotación funcional de los genes 
+El análisis se implementará en Python con PyDESeq2 [6], y la anotación funcional de los genes 
 se construirá con Biopython a partir de los registros GenBank del genoma (AE016853–AE016855). 
 El resultado principal será una tabla de genes diferencialmente expresados con su magnitud de 
-cambio (7) y su significancia estadística corregida, representada visualmente mediante un heatmap 
-y un volcano plot (8).
+cambio [7] y su significancia estadística corregida, representada visualmente mediante un heatmap 
+y un volcano plot [8].
 
 
 ## 2. Planteamiento del problema
@@ -148,10 +148,7 @@ y significancia. Los resultados podrán visualizarse mediante un volcano plot y 
 **Pregunta:** ¿Qué funciones biológicas y procesos asociados con la adaptación al hospedero y la 
 patogénesis están representados entre los genes diferencialmente expresados durante la infección?
 
-**Evidencia necesaria:** Anotación funcional de los genes diferencialmente expresados y clasificación 
-de estos según sus funciones, particularmente aquellas relacionadas con secreción y efectores, 
-transporte y adquisición de nutrientes, regulación, adhesión, respuesta al estrés y otros mecanismos 
-asociados con la virulencia.
+**Evidencia necesaria:** Anotación funcional de los genes diferencialmente expresados y clasificación de estos según sus funciones, particularmente aquellas relacionadas con secreción y efectores, transporte y adquisición de nutrientes, regulación, adhesión, respuesta al estrés y otros mecanismos asociados con la virulencia.
 
 ### Pregunta 3
 
@@ -172,7 +169,6 @@ EJEMPLO: Se analizarán como máximo 20 genomas completos de RefSeq. No se
 utilizarán datos clínicos ni se realizará validación experimental. -->
 
 ### Incluye
-
 - **Análisis bioinformático** Control de calidad de datos, cuantificación de la expresión génica
 - **Muestras y datos:** 
 Datos de RNA-seq: (Serie GEO `GSE103442` / BioProject `PRJNA419365`, Nobori et al., 2018) que abarcan condiciones de infección (_in planta_) frente a controles de crecimiento no infectivo (_in vitro_).
@@ -185,15 +181,15 @@ Ensamblado de RefSeq `GCF_000007805.1` para el alineamiento y anotación funcion
 - **Otras cepas u organismos:** No se evaluarán otras cepas de _P. syringae_ ni otros patógenos u 
 hospederos alternativos.    
 -   **Transcriptómica del hospedero:** No se caracterizará la respuesta transcripcional de 
-_Arabidopsis thaliana_, enfocándose únicamente en el transcriptoma bacteriano.
--   **Secuenciación de nuevo (_de novo_):** No se generarán datos de secuenciación propios ni se 
+*Arabidopsis thaliana*, enfocándose únicamente en el transcriptoma bacteriano.
+-   **Secuenciación de nuevo (*de novo*):** No se generarán datos de secuenciación propios ni se 
 realizará ensamblado _de novo_.
 
 ### Limitaciones conocidas
 
-- **Origen de los datos:** Dependencia total de la calidad, profundidad de secuenciación y diseño 
-experimental de los datos públicos depositados en NCBI por Nobori et al. (2018) y Buell et al. (2003).
-- **Falta de anotación certera:** A pesar de identificar cambios de expresión, no se podrá asegurar la función de putativos en el proceso de infección.
+- **Origen de los datos:** Dependencia total de la calidad, profundidad de secuenciación y diseño  
+experimental de los datos públicos depositados en NCBI por Nobori _et al,._ (2018) y Buell _et al,._ (2003).
+- **Falta de anotación certera:** A pesar de identificar cambios de expresión, no se podrá asegurar la función de genes putativos en el proceso de infección.
 
 ## 7. Propuesta de solución
 
@@ -225,8 +221,8 @@ EJEMPLO: NCBI RefSeq, GCF_000005845.2, consultado el dd/mm/aaaa. -->
 
 | Fuente | Identificador o versión | URL | Fecha de consulta | Licencia o condiciones |
 |:--|:--|:--|:--|:--|
-| NCBI Assembly / RefSeq (NCBI / NIH) | Genoma de referencia _Pseudomonas syringae_ pv. _tomato_ DC3000	`GCF_000007805.1` (NC_004578.1) |	[https://www.ncbi.nlm.nih.gov/assembly/29388](https://www.ncbi.nlm.nih.gov/assembly/29388)	|	30/08/2026	|	Dominio Público. Uso libre para investigación académica y comercial.
-| NCBI GEO (Gene Expression Omnibus)	|	Datos de RNA-seq de _P. syringae_ DC3000 (_in planta_ vs. _in vitro_) Serie GEO: `GSE103442` (BioProject: `PRJNA401390`)	|	https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE103442	|	30/08/2026	|	Datos de acceso abierto. Reutilización libre citando la publicación de Nobori et al. (2018).
+| NCBI Assembly / RefSeq (NCBI / NIH) | Genoma de referencia *Pseudomonas syringae* pv. *tomato* DC3000	`GCF_000007805.1` (NC_004578.1) |	[https://www.ncbi.nlm.nih.gov/assembly/29388](https://www.ncbi.nlm.nih.gov/assembly/29388)	|	30/08/2026	|	Dominio Público. Uso libre para investigación académica y comercial.
+| NCBI GEO (Gene Expression Omnibus)	|	Datos de RNA-seq de *P. syringae* DC3000 (*in planta* vs. *in vitro*) Serie GEO: `GSE103442` (BioProject: `PRJNA401390`)	|	https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE103442	|	30/08/2026	|	Datos de acceso abierto. Reutilización libre citando la publicación de Nobori et al. (2018).
 
 ### 8.2 Características de los datos
 
@@ -236,6 +232,7 @@ EJEMPLO: Archivos FASTA y GFF3 de 20 genomas completos de E. coli. -->
 
 **1. Descripción del genoma de referencia de _Pseudomonas syringae_**
 -   **Organismo:** _Pseudomonas syringae_ pv. _tomato_ (cepa DC3000).
+
 -   **Muestras / Tipo de datos:** Genoma bacteriano completo de referencia y su anotación funcional. 
 -   **Variables / Atributos:** Secuencia completa de nucleótidos del cromosoma bacteriano 
 (~6.39 Mb, ~5,600 genes codificantes de proteínas) y sus plásmidos asociados (pDC3000A y pDC3000B). 
@@ -246,19 +243,22 @@ en formato **GFF3** (`.gff`) o **GTF**.
 `NC_004578.1`).
 -   **Tamaño:** ~2.0 MB comprimido (`.gz`).
 
-**2.  Descripción de los datos transcriptómicos de _Pseudomonas syringae_**
+**2.  Descripción de los datos transcriptómicos de *Pseudomonas syringae***
 
--   **Organismo:** _Pseudomonas syringae_ pv. _tomato_ (cepa DC3000).
+-   **Organismo:** *Pseudomonas syringae* pv. *tomato* (cepa DC3000).
 -   **Muestras:** Muestras de ARN bacteriano extraído directamente de dos condiciones experimentales:
-    1.  _In planta:_ Bacterias aisladas o recolectadas del apoplasto de _Arabidopsis thaliana_ 
+    1.  *In planta:* Bacterias aisladas o recolectadas del apoplasto de *Arabidopsis thaliana* 
     durante el proceso de infección.
-    2.  _In vitro:_ Bacterias cultivadas en medio sintético de laboratorio (condición control/no infectiva).
--   **Variables / Atributos:** Niveles de abundancia de transcritos de ARN (expresión génica bacteriana) en respuesta al entorno del hospedero. Mide la cantidad de lecturas mapeadas por gen bacteriano para comparar la activación de factores de virulencia, efectores y metabolismo adaptativo.
+    2.  *In vitro:* Bacterias cultivadas en medio sintético de laboratorio (condición control/no infectiva).
+-   **Variables / Atributos:** Niveles de abundancia de transcritos de ARN (expresión génica bacteriana) 
+en respuesta al entorno del hospedero. Mide la cantidad de lecturas mapeadas por gen bacteriano para 
+comparar la activación de factores de virulencia, efectores y metabolismo adaptativo.
+
 -   **Formatos:**
-    -   **Datos procesados:** Matriz de conteos (_read counts table_) en texto plano delimitado 
+    -   **Datos procesados:** Matriz de conteos (*read counts table*) en texto plano delimitado 
     por tabuladores (`.txt` o `.tsv` comprimido en `.gz`), con filas representando IDs de genes de 
     DC3000 y columnas representando las réplicas biológicas.
-    -   **Datos brutos:** Archivos de secuenciación de alto rendimiento (_Illumina_) en formato 
+    -   **Datos brutos:** Archivos de secuenciación de alto rendimiento (*Illumina*) en formato 
     **FASTQ** comprimido (`.fastq.gz`) almacenados en SRA.
 -   **Versión:** Serie GEO `GSE103442` (Estudio de Nobori et al., 2018).
 -   **Tamaño:** ~5–15 MB para la tabla de datos procesados/conteos; varios Gigabytes (~10–30 GB) 
@@ -342,7 +342,9 @@ EJEMPLO: Ana desarrolla la descarga y revisa el módulo de visualización. -->
 
 | Integrante | Responsabilidad principal | Responsabilidad de revisión |
 |:--|:--|:--|
-| [Nombre] | [Responsabilidad] | [Qué o a quién revisará] |
+|   Itayetzi Corona Aquino  |   [Responsabilidad] | [Qué o a quién revisará] |
+|   Leilani Cruz Ramírez    |   [Responsabilidad] | [Qué o a quién revisará] |
+|   Andrómeda Coral Gutiérrez   |      [Responsabilidad] | [Qué o a quién revisará] |
 
 ### 10.2 Riesgos y alternativas
 

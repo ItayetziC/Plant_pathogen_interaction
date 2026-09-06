@@ -172,19 +172,16 @@ EJEMPLO: Se analizarán como máximo 20 genomas completos de RefSeq. No se
 utilizarán datos clínicos ni se realizará validación experimental. -->
 
 ### Incluye
-
-- **Análisis bioinformático** (Control de calidad de datos, cuantificación de la expresión génica)
-- **Muestras y datos:** Datos secundarios de RNA-seq (Serie GEO `GSE103442` / BioProject `PRJNA419365`, 
-Nobori et al., 2018) que abarcan condiciones de infección (*in planta*) frente a controles de 
-crecimiento no infectivo (*in vitro*).
-- **Genoma de referencia:** Ensamblado de RefSeq `GCF_000007805.1` para el alineamiento y anotación 
-funcional de la bacteria.
+- **Análisis bioinformático** Control de calidad de datos, cuantificación de la expresión génica
+- **Muestras y datos:** 
+Datos de RNA-seq: (Serie GEO `GSE103442` / BioProject `PRJNA419365`, Nobori et al., 2018) que abarcan condiciones de infección (_in planta_) frente a controles de crecimiento no infectivo (_in vitro_).
+- **Genoma de referencia:** 
+Ensamblado de RefSeq `GCF_000007805.1` para el alineamiento y anotación funcional de la bacteria realizado por Buell et al., (2003)
 
 ### No incluye
 
-- **Validación experimental** (Ensayos de laboratorio (*wet-lab*), como RT-qPCR, mutagénesis ni infecciones 
-*in vivo*).
-- **Otras cepas u organismos:** No se evaluarán otras cepas de *P. syringae* ni otros patógenos u 
+- **Validación experimental** (Ensayos de laboratorio (_wet-lab_), como RT-qPCR, mutagénesis ni infecciones _in vivo_).
+- **Otras cepas u organismos:** No se evaluarán otras cepas de _P. syringae_ ni otros patógenos u 
 hospederos alternativos.    
 -   **Transcriptómica del hospedero:** No se caracterizará la respuesta transcripcional de 
 *Arabidopsis thaliana*, enfocándose únicamente en el transcriptoma bacteriano.
@@ -193,7 +190,7 @@ realizará ensamblado _de novo_.
 
 ### Limitaciones conocidas
 
-- **Origen de los datos:** Dependencia total de la calidad, profundidad de secuenciación y diseño 
+- **Origen de los datos:** Dependencia total de la calidad, profundidad de secuenciación y diseño  
 experimental de los datos públicos depositados en NCBI por Nobori _et al,._ (2018) y Buell _et al,._ (2003).
 - **Falta de anotación certera:** A pesar de identificar cambios de expresión, no se podrá asegurar la función
 - de genes putativos en el proceso de infección.
@@ -237,8 +234,9 @@ EJEMPLO: NCBI RefSeq, GCF_000005845.2, consultado el dd/mm/aaaa. -->
 atributos necesarios para interpretar los datos.
 EJEMPLO: Archivos FASTA y GFF3 de 20 genomas completos de E. coli. -->
 
-**1. Genoma de referencia de *Pseudomonas syringae***
--   **Organismo:** *Pseudomonas syringae* pv. *tomato* (cepa DC3000).
+**1. Descripción del genoma de referencia de _Pseudomonas syringae_**
+-   **Organismo:** _Pseudomonas syringae_ pv. _tomato_ (cepa DC3000).
+
 -   **Muestras / Tipo de datos:** Genoma bacteriano completo de referencia y su anotación funcional. 
 -   **Variables / Atributos:** Secuencia completa de nucleótidos del cromosoma bacteriano 
 (~6.39 Mb, ~5,600 genes codificantes de proteínas) y sus plásmidos asociados (pDC3000A y pDC3000B). 
@@ -259,6 +257,7 @@ en formato **GFF3** (`.gff`) o **GTF**.
 -   **Variables / Atributos:** Niveles de abundancia de transcritos de ARN (expresión génica bacteriana) 
 en respuesta al entorno del hospedero. Mide la cantidad de lecturas mapeadas por gen bacteriano para 
 comparar la activación de factores de virulencia, efectores y metabolismo adaptativo.
+
 -   **Formatos:**
     -   **Datos procesados:** Matriz de conteos (*read counts table*) en texto plano delimitado 
     por tabuladores (`.txt` o `.tsv` comprimido en `.gz`), con filas representando IDs de genes de 

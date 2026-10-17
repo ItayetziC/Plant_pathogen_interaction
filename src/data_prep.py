@@ -126,4 +126,4 @@ def clean_and_filter(
 
     # condicion de cada muestra elegida, en el mismo orden que las columnas
     meta = chosen.set_index("sample")[["condition"]]
-    return filtered, meta
+    return filtered, meta  

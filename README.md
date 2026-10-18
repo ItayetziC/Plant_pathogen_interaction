@@ -1,69 +1,53 @@
 # Análisis transcriptómico diferencial de Pseudomonas syringae durante la infección de Arabidopsis thaliana
 
-# Se ubica en [Plant_pathogen_interaction](https://github.com/ItayetziC/Plant_pathogen_interaction)
+## Se ubica en [Plant_pathogen_interaction](https://github.com/ItayetziC/Plant_pathogen_interaction)
 
 ## Funcionalidades
+-  Descarga y limpieza de matriz de conteo de expresión de genes condiciones de infección de _Pseudomonas syringae_ (_in planta_) frente a controles de crecimiento no infectivo (_in vitro_). 
+- Descarga y valida los registros de GenBank para la anotación funcional de la bacteria, a partir del genoma secuenciado por Buell et al. (2003).
+- Control de calidad de datos por medio de un PCA de las muestras obtenidas.
 
-- [Funcionalidad disponible 1]
-- [Funcionalidad disponible 2]
-- [Funcionalidad disponible 3]
-
-<!--
-AYUDA:
-Describan solamente capacidades que ya funcionan. Comiencen cada elemento con un
-verbo. Las funciones planeadas deben registrarse como issues y/o en GitHub Projects.
-
-EJEMPLO:
-- Descarga genomas mediante identificadores de NCBI.
-- Lee archivos FASTA y GFF3.
-- Genera una tabla de presencia y ausencia de genes.
--->
 
 ## Estructura del repositorio
 
 ```text
 Plant_pathogen_interaction/
-├── data/           # Datos de ejemplo o archivos pequeños
-├── docs/           # Reporte y documentación
-├── notebooks/      # Análisis exploratorios
-├── results/        # Tablas y figuras generadas
-├── src/            # Código fuente
-├── tests/          # Pruebas
-├── CITATION.cff    # Información para citar el software
-├── LICENSE         # Licencia
-└── README.md       # Introducción y guía rápida de uso
+├── data/            # Datos descargados (raw) y derivados (processed); no versionados
+├── docs/            # Reporte y documentación
+├── notebooks/       # Análisis exploratorios
+├── results/         # Tablas y figuras generadas
+├── src/             # Código fuente
+├── tests/           # Pruebas
+├── CITATION.cff     # Información para citar el software
+├── LICENSE          # Licencia
+└── README.md        # Introducción y guía rápida de uso
+└── requirements.txt # Lista de librerías requeridas
+
 ```
 
-<!--
-AYUDA:
-Modifiquen el árbol para que represente su repositorio real y eliminen carpetas
-que no utilicen. Expliquen solamente los elementos principales; no enumeren cada
-archivo. Eviten almacenar datos grandes, usuarios/contraseñas o información sensible.
--->
+
 
 ## Requisitos
 
-- [Lenguaje y versión]
-- [Herramienta o biblioteca indispensable]
-- [Recurso computacional o condición de acceso]
-
-<!--
-AYUDA:
-Indiquen lo necesario antes de instalar o ejecutar el proyecto: versión de Python,
-sistema operativo si es relevante, memoria, almacenamiento o acceso a servicios.
-
-EJEMPLO:
-- Python 3.12 o posterior.
+- Python 3.13 o posterior.
 - Git.
-- 4 GB de memoria RAM.
-- Conexión a internet para obtener datos.
-
-No registren usuarios, contraseñas, tokens ni llaves privadas-->
+- Jupyter Notebook o JupyterLab para ejecutar `notebooks/01_descarga.ipynb`.
+- Bibliotecas de Python: `biopython`, `pandas`, `numpy`, `matplotlib`.
+- Conexión a internet para consultar NCBI Entrez y descargar los datos de GEO.
+- Una dirección de correo electrónico válida: NCBI la exige para identificar
+  las consultas a Entrez. Debe configurarse en la celda 1 del notebook
+  (`Entrez.email`) antes de ejecutarlo.
+- Menos de 1 GB de memoria RAM y unos 5 MB de espacio en disco para los datos
+  descargados.
 
 
 ## Datos
+El proyecto utiliza dos fuentes públicas del NCBI: 
+- **Matriz de conteos**: serie [GSE103441](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE103441) de GEO (Nobori et al., 2018), con 114 muestras de RNA-seq bacteriano _in planta_ y en medio de cultivo. 
+- **Genoma de referencia**: registros `NC_004578.1` (cromosoma), `NC_004632.1` (plásmido pDC3000A) y `NC_004633.1` (plásmido pDC3000B) de NCBI Nucleotide. 
 
-[Expliquen cómo obtener los datos y dónde colocarlos.]
+Los datos no se versionan en este repositorio: se descargan automáticamente al ejecutar el notebook. Antes de hacerlo, configura la dirección de correo en la celda 1 (`Entrez.email`), ya que NCBI la exige para identificar las consultas. 
+Los archivos descargados se guardan en `data/raw/` y los archivos derivados en `data/processed/`. Ambas carpetas se crean automáticamente si no existen. La procedencia, el diseño experimental y los criterios de selección de muestras se documentan en el [reporte del proyecto](docs/project_report.md).
 
 <!--
 AYUDA:
@@ -86,13 +70,24 @@ La procedencia y características detalladas se describen en el
 
 ## Uso
 
-[Expliquen qué hace el siguiente comando y qué entradas necesita.]
+El pipeline se ejecuta desde un notebook de Jupyter que importa las funciones
+de `src/`. Desde la raíz del repositorio:
 
 ```bash
-python src/main.py [argumentos]
+jupyter notebook notebooks/01_descarga.ipynb
 ```
 
-[Indiquen dónde se guardan los resultados.]
+Ejecuten las celdas en orden. El notebook realiza tres tareas encadenadas:
+consulta y descarga los datos de GEO, selecciona y limpia las muestras de
+interés, y construye la anotación funcional del genoma a partir de los
+registros GenBank.
+
+No requiere argumentos de línea de comandos. El único valor que debe
+modificarse antes de ejecutar es `Entrez.email` en la celda 1.
+
+Los archivos generados se escriben en `data/processed/`  y `data/raw/` y las figuras en
+`results/figures/`.
+
 
 <!--
 AYUDA:
@@ -108,18 +103,33 @@ Para analizar los identificadores incluidos en data/accessions.txt:
 El comando generará results/gene_matrix.csv y results/heatmap.png.
 -->
 
+
 ## Reproducción de resultados
 
-Ejecuten los siguientes pasos en el orden indicado:
+Desde un entorno limpio, ejecuten los siguientes pasos en orden:
 
 ```bash
-python scripts/download_data.py
-python src/run_analysis.py
-python src/create_figures.py
+git clone https://github.com/ItayetziC/Plant_pathogen_interaction.git
+cd Plant_pathogen_interaction
+pip install -r requirements.txt
+jupyter notebook notebooks/01_descarga.ipynb
 ```
 
-Los resultados esperados se generarán en `results/`.
+Antes de ejecutar las celdas, modifiquen `Entrez.email` en la celda 1.
 
+Al terminar el notebook se habrán generado los siguientes archivos:
+
+| Archivo | Contenido |
+|:--|:--|
+| `data/raw/GSE103441_count.txt.gz` | Matriz de conteos original descargada de GEO |
+| `data/raw/NC_004578.1.gb` y los dos plásmidos | Registros GenBank del genoma de DC3000 |
+| `data/processed/GEO_samples.csv` | Las 114 muestras de la serie con su código GSM |
+| `data/processed/counts_filtered.csv` | Matriz de conteos crudos filtrada, restringida a las muestras del contraste |
+| `data/processed/sample_metadata.csv` | Condición experimental y código GSM de cada muestra seleccionada |
+| `data/processed/final_annotation.csv` | Anotación funcional por gen, combinando GenBank y la matriz |
+| `results/figures/pca_samples.png` | Análisis de componentes principales de las muestras |
+
+La ejecución completa tarda unos pocos minutos y requiere conexión a internet.
 <!--
 AYUDA:
 Proporcionen la ruta más corta para regenerar el resultado principal desde los
@@ -135,7 +145,8 @@ figuras utilizadas en el reporte. Sus nombres esperados deben indicarse aquí.
 
 ## Documentación
 
-- [Reporte del proyecto](docs/reporte-proyecto.md)
+Para más información consulta:
+- [Reporte del proyecto](docs/project_report.md)
 - [Información para citar el software](CITATION.cff)
 
 <!--
@@ -149,67 +160,28 @@ EJEMPLO:
 
 ## Equipo
 
-- Andrómeda Coral Gutiérrez — PENDIENTE
-- Itayetzi Corona Aquino — PENDIENTE
-- Leilani Cruz Ramírez — PENDIENTE
+- Andrómeda Coral Gutiérrez — Descarga y procesamiento de datos e integración a Git
+- Itayetzi Corona Aquino — Análisis bioinformático y visualización
+- Leilani Cruz Ramírez — Documentación e interpretación biológica de los datos
 
-<!--
-AYUDA:
-Identifiquen a las tres personas. Describan brevemente sus contribuciones generales.
-Las actividades específicas y revisiones se consultan en los issues, Pull Requests,
-GitHub Projects y el historial de Git.
-
-EJEMPLO:
-- Ana Pérez — procesamiento de datos y pruebas.
-- Luis López — análisis y visualización.
-- María García — documentación e integración.
--->
 
 ## Citación
 
 Si utilizas este software, consulta [CITATION.cff](CITATION.cff) o la opción
 **Cite this repository** de GitHub.
 
-<!--
-AYUDA:
-Mantengan CITATION.cff actualizado con autores, título y versión. Si el proyecto
-obtiene un DOI, añadan aquí la referencia recomendada.
-
-EJEMPLO:
-La forma recomendada de citar la versión v1.0.0 se encuentra en CITATION.cff.
--->
 
 ## Licencia
 
 El código se distribuye bajo la licencia MIT. Consulta el [LICENSE](https://github.com/ItayetziC/Plant_pathogen_interaction/blob/main/LICENSE) para conocer
 los términos de uso.
 
-<!--
-AYUDA:
-Especifiquen la licencia del código y asegúrense de incluir el archivo LICENSE.
-Las condiciones de uso de los datos pueden ser distintas y deben indicarse en la
-sección Datos y en el reporte.
-
-EJEMPLO:
-El código se distribuye bajo la licencia MIT. Consulta LICENSE.
--->
 
 ## Agradecimientos
 
-[Incluyan reconocimientos institucionales o académicos]
+Proyecto desarrollado en la Licenciatura en Ciencias Genómicas, UNAM, como parte de la asignatura de Biopython.
+Se le agradece a las docentes; Dra. Verónica Jiménez, Dra. Leticia Vega y a la maestra Shirley Alquicira por su apoyo. Además se le agradece a Pablo Salazar por su asesoría durante la realización del proyecto. 
 
-<!--
-AYUDA:
-Esta sección es opcional. Reconozcan laboratorios, docentes, instituciones,
-proyectos o financiamientos que apoyaron el trabajo. No incluyan como autores a
-personas que sólo deban aparecer en los agradecimientos.
-
-EJEMPLO:
-Proyecto desarrollado en la Licenciatura en Ciencias Genómicas, UNAM, como parte
-de la asignatura [nombre].
--->
-
----
 
 <!--
 LISTA DE COMPROBACIÓN ANTES DE ENTREGAR:

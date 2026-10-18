@@ -310,9 +310,14 @@ actualícenla con lo que realmente ejecutaron, incluidos parámetros y decisione
 de resultados. Relacionen cada etapa con una pregunta u objetivo.
 EJEMPLO: descarga, validación, transformación, análisis, visualización y pruebas. -->
 
-1. [Etapa 1]
-2. [Etapa 2]
-3. [Etapa 3]
+1. -   Preparación de Datos: 
+	- Descarga y limpieza de matriz de conteo de expresión de genes condiciones de infección de _Pseudomonas syringae_ (_in planta_) frente a controles de crecimiento no infectivo (_in vitro_).
+	- Descarga y valida los registros de GenBank para la anotación funcional de la bacteria, a partir del genoma secuenciado por Buell et al. (2003).
+	- Control de calidad de datos por medio de un PCA de las muestras obtenidas.
+
+2. Análisis de expresión diferencial.
+
+3. Interpretación biológica de los resultados.
 
 ### 9.2 Herramientas y tecnologías
 
@@ -323,7 +328,13 @@ visualización. -->
 
 | Herramienta | Versión | Propósito |
 |:--|:--|:--|
-| [Herramienta] | [Versión] | [Uso] |
+| Python | 3.13 (o posterior) | Para la ejecución de código |
+| Jupyter Notebook | 7.6.3 | Dividir el código en partes |
+| Biopython | 1.88 | Acceder a Entrez | 
+| Pandas | 3.0.6 | Manipulación y análisis de datos tabulares |
+| Matplotlib.pyplot | 3.11.1 | Crear y modificar gráficos
+| Numpy | 2.5.4 | Manejo de datos y cálculos numéricos
+
 
 
 ### 9.3 Estrategia de validación
@@ -401,11 +412,11 @@ y cómo citarlo. Relacionen esta sección con LICENSE, CITATION.cff, codemeta.js
 release final y, cuando corresponda, un DOI.
 EJEMPLO: Código en GitHub bajo MIT; cita disponible en CITATION.cff. -->
 
-**Código:** [URL]  
-**Datos:** [URL, identificador o instrucciones]  
-**Licencia del código:** [Licencia]  
-**Cómo citar:** [Referencia o enlace a CITATION.cff]  
-**Versión o release:** [URL]
+**Código:** [Código](https://github.com/ItayetziC/Plant_pathogen_interaction.git)
+**Datos:** [Instrucciones de obtención](https://github.com/ItayetziC/Plant_pathogen_interaction.git)  
+**Licencia del código:** [Licencia](https://github.com/ItayetziC/Plant_pathogen_interaction/blob/main/LICENSE)  
+**Cómo citar:** [Para citar](https://github.com/ItayetziC/Plant_pathogen_interaction/blob/main/CITATION.cff)  
+**Versión o release:** [Versión](https://github.com/ItayetziC/Plant_pathogen_interaction/releases/tag/v1.2.0)
 
 ## 15. Referencias
 

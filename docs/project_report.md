@@ -226,7 +226,7 @@ EJEMPLO: NCBI RefSeq, GCF_000005845.2, consultado el dd/mm/aaaa. -->
 | Fuente | Identificador o versión | URL | Fecha de consulta | Licencia o condiciones |
 |:--|:--|:--|:--|:--|
 | NCBI Assembly / RefSeq (NCBI / NIH) | Genoma de referencia *Pseudomonas syringae* pv. *tomato* DC3000	`GCF_000007805.1`  (NC_004578.1 , NC_004633.1 y NC_004632.1) |	[https://www.ncbi.nlm.nih.gov/assembly/29388](https://www.ncbi.nlm.nih.gov/assembly/29388)	|	30/08/2026	|	Dominio Público. Uso libre para investigación académica y comercial.
-| NCBI GEO (Gene Expression Omnibus)	|	Datos de RNA-seq de *P. syringae* DC3000 (*in planta* vs. *in vitro*) Serie GEO: `GSE103441` (BioProject: `PRJNA401856`)	|	https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE103442	|	30/08/2026	|	Datos de acceso abierto. Reutilización libre citando la publicación de Nobori _et al._ (2018).
+| NCBI GEO (Gene Expression Omnibus)	|	Datos de RNA-seq de *P. syringae* DC3000 (*in planta* vs. *in vitro*) Serie GEO: `GSE103441` (BioProject: `PRJNA401856`)	|	https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE103441	|	30/08/2026	|	Datos de acceso abierto. Reutilización libre citando la publicación de Nobori _et al._ (2018).
 
 ### 8.2 Características de los datos
 

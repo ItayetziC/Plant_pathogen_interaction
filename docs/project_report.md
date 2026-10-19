@@ -12,7 +12,7 @@ Escherichia coli. -->
 | Integrante 2 | Leilani Cruz Ramírez leilanic@lcg.unam.mx |
 | Integrante 3 | Andrómeda Coral Gutiérrez andcoral@lcg.unam.mx |
 | Fecha de creación | 25/08/2026 |
-| Última actualización | 05/09/2026 |
+| Última actualización | 18/10/2026 |
 | Repositorio | https://github.com/ItayetziC/Plant_pathogen_interaction |
 
 <!-- AYUDA: Mantengan actualizados el estado, la fecha y la versión. La versión
@@ -59,7 +59,7 @@ menos caracterizado. Esto se debe a que, en tejido vegetal infectado, el ARN bac
 mínima del ARN total, el cual está dominado por los transcritos de la planta. Sin embargo, en 2018 Nobori _et al_. 
 [5] desarrollaron métodos de enriquecimiento que permitieron superar este obstáculo y 
 generaron el transcriptoma de DC3000 durante la infección de _A. thaliana_, depositado públicamente 
-como GSE103442.
+como GSE103442 y GSE103441.
 
 En este proyecto se realizará un análisis de expresión génica diferencial utilizando el 
 conjunto de datasets de Buell _et al._, (2003) y Nobori _et al._, (2018) para comparar 
@@ -71,7 +71,7 @@ Aproximadamente 658 genes estaban anotados como proteínas hipotéticas, lo que 
 considerable de genes activos durante la infección carece de función asignada [5]. De modo
 que se podrían identificar cambios de expresión cuyo significado biológico permanece indeterminado.
 
-El análisis se implementará en Python con PyDESeq2 [6], y la anotación funcional de los genes 
+El análisis se implementará en Python con inmoose [6], y la anotación funcional de los genes 
 se construirá con Biopython a partir de los registros GenBank del genoma (AE016853–AE016855). 
 El resultado principal será una tabla de genes diferencialmente expresados con su magnitud de 
 cambio [7] y su significancia estadística corregida, representada visualmente mediante un heatmap 
@@ -173,7 +173,7 @@ utilizarán datos clínicos ni se realizará validación experimental. -->
 ### Incluye
 - **Análisis bioinformático** Control de calidad de datos, cuantificación de la expresión génica
 - **Muestras y datos:** 
-Datos de RNA-seq: (Serie GEO `GSE103442` / BioProject `PRJNA419365`, Nobori et al., 2018) que abarcan condiciones de infección (_in planta_) frente a controles de crecimiento no infectivo (_in vitro_).
+Datos de RNA-seq: (Serie GEO `GSE103441` / BioProject `PRJNA401856`, Nobori et al., 2018) que abarcan condiciones de infección (_in planta_) frente a controles de crecimiento no infectivo (_in vitro_).
 - **Genoma de referencia:** 
 Ensamblado de RefSeq `GCF_000007805.1` para el alineamiento y anotación funcional de la bacteria realizado por Buell et al., (2003)
 
@@ -191,6 +191,7 @@ realizará ensamblado _de novo_.
 
 - **Origen de los datos:** Dependencia total de la calidad, profundidad de secuenciación y diseño  
 experimental de los datos públicos depositados en NCBI por Nobori _et al,._ (2018) y Buell _et al,._ (2003).
+	- **Número de réplicas:** De la bacteria se tienen 13 muestras _in planta_ vs. 2 muestras _in vitro_. Lo que baja el poder estadístico.
 - **Falta de anotación certera:** A pesar de identificar cambios de expresión, no se podrá asegurar la función
 - de genes putativos en el proceso de infección.
 
@@ -224,8 +225,8 @@ EJEMPLO: NCBI RefSeq, GCF_000005845.2, consultado el dd/mm/aaaa. -->
 
 | Fuente | Identificador o versión | URL | Fecha de consulta | Licencia o condiciones |
 |:--|:--|:--|:--|:--|
-| NCBI Assembly / RefSeq (NCBI / NIH) | Genoma de referencia *Pseudomonas syringae* pv. *tomato* DC3000	`GCF_000007805.1` (NC_004578.1) |	[https://www.ncbi.nlm.nih.gov/assembly/29388](https://www.ncbi.nlm.nih.gov/assembly/29388)	|	30/08/2026	|	Dominio Público. Uso libre para investigación académica y comercial.
-| NCBI GEO (Gene Expression Omnibus)	|	Datos de RNA-seq de *P. syringae* DC3000 (*in planta* vs. *in vitro*) Serie GEO: `GSE103442` (BioProject: `PRJNA401390`)	|	https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE103442	|	30/08/2026	|	Datos de acceso abierto. Reutilización libre citando la publicación de Nobori _et al._ (2018).
+| NCBI Assembly / RefSeq (NCBI / NIH) | Genoma de referencia *Pseudomonas syringae* pv. *tomato* DC3000	`GCF_000007805.1`  (NC_004578.1 , NC_004633.1 y NC_004632.1) |	[https://www.ncbi.nlm.nih.gov/assembly/29388](https://www.ncbi.nlm.nih.gov/assembly/29388)	|	30/08/2026	|	Dominio Público. Uso libre para investigación académica y comercial.
+| NCBI GEO (Gene Expression Omnibus)	|	Datos de RNA-seq de *P. syringae* DC3000 (*in planta* vs. *in vitro*) Serie GEO: `GSE103441` (BioProject: `PRJNA401856`)	|	https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE103442	|	30/08/2026	|	Datos de acceso abierto. Reutilización libre citando la publicación de Nobori _et al._ (2018).
 
 ### 8.2 Características de los datos
 
@@ -243,13 +244,13 @@ Incluye coordenadas genómicas de exones, CDS, rRNAs, tRNAs y nombres de genes.
 -   **Formatos:** Archivo de secuencia en formato **FASTA** (`.fna`) y archivo de anotación genómica 
 en formato **GFF3** (`.gff`) o **GTF**.
 -   **Versión:** Ensamblado de RefSeq `GCF_000007805.1` (Secuencia de acceso al cromosoma principal: 
-`NC_004578.1`).
+`NC_004578.1`; y Secuencias de acceso a los plásmidos: `NC_004633.1` y `NC_004632.1`).
 -   **Tamaño:** ~2.0 MB comprimido (`.gz`).
 
 **2.  Descripción de los datos transcriptómicos de *Pseudomonas syringae***
 
 -   **Organismo:** *Pseudomonas syringae* pv. *tomato* (cepa DC3000).
--   **Muestras:** Muestras de ARN bacteriano extraído directamente de dos condiciones experimentales:
+-   **Muestras:** Muestras de perfiles transcriptómicos bacterianos derivados del procesamiento de la matriz de conteos (`GSE103441_count.txt.gz`), correspondientes a dos condiciones experimentales:
     1.  *In planta:* Bacterias aisladas o recolectadas del apoplasto de *Arabidopsis thaliana* 
     durante el proceso de infección.
     2.  *In vitro:* Bacterias cultivadas en medio sintético de laboratorio (condición control/no infectiva).
@@ -263,9 +264,8 @@ comparar la activación de factores de virulencia, efectores y metabolismo adapt
     DC3000 y columnas representando las réplicas biológicas.
     -   **Datos brutos:** Archivos de secuenciación de alto rendimiento (*Illumina*) en formato 
     **FASTQ** comprimido (`.fastq.gz`) almacenados en SRA.
--   **Versión:** Serie GEO `GSE103442` (Estudio de Nobori et al., 2018).
--   **Tamaño:** ~5–15 MB para la tabla de datos procesados/conteos; varios Gigabytes (~10–30 GB) 
-para los archivos brutos FASTQ completos.
+-   **Versión:** Serie GEO `GSE103441` (Estudio de Nobori et al., 2018).
+-   **Tamaño:** ~870.4 Kb para la tabla de datos procesados/conteos.
 
 
 ### 8.3 Organización de los datos
@@ -278,11 +278,13 @@ EJEMPLO: data/raw conserva originales y data/processed los derivados. -->
 ```text
 proyecto/
 ├── data/
-│   ├── raw/
-│   └── processed/
+│ ├── raw/
+│ └── processed/
 ├── docs/
 ├── notebooks/
 ├── results/
+│ ├── figures/
+│ ├── tables/
 ├── src/
 └── tests/
 ```
@@ -308,9 +310,14 @@ actualícenla con lo que realmente ejecutaron, incluidos parámetros y decisione
 de resultados. Relacionen cada etapa con una pregunta u objetivo.
 EJEMPLO: descarga, validación, transformación, análisis, visualización y pruebas. -->
 
-1. [Etapa 1]
-2. [Etapa 2]
-3. [Etapa 3]
+1. -   Preparación de Datos: 
+	- Descarga y limpieza de matriz de conteo de expresión de genes condiciones de infección de _Pseudomonas syringae_ (_in planta_) frente a controles de crecimiento no infectivo (_in vitro_).
+	- Descarga y valida los registros de GenBank para la anotación funcional de la bacteria, a partir del genoma secuenciado por Buell et al. (2003).
+	- Control de calidad de datos por medio de un PCA de las muestras obtenidas.
+
+2. Análisis de expresión diferencial.
+
+3. Interpretación biológica de los resultados.
 
 ### 9.2 Herramientas y tecnologías
 
@@ -321,7 +328,13 @@ visualización. -->
 
 | Herramienta | Versión | Propósito |
 |:--|:--|:--|
-| [Herramienta] | [Versión] | [Uso] |
+| Python | 3.13 (o posterior) | Para la ejecución de código |
+| Jupyter Notebook | 7.6.3 | Dividir el código en partes |
+| Biopython | 1.88 | Acceder a Entrez | 
+| Pandas | 3.0.6 | Manipulación y análisis de datos tabulares |
+| Matplotlib.pyplot | 3.11.1 | Crear y modificar gráficos
+| Numpy | 2.5.4 | Manejo de datos y cálculos numéricos
+
 
 
 ### 9.3 Estrategia de validación
@@ -399,11 +412,11 @@ y cómo citarlo. Relacionen esta sección con LICENSE, CITATION.cff, codemeta.js
 release final y, cuando corresponda, un DOI.
 EJEMPLO: Código en GitHub bajo MIT; cita disponible en CITATION.cff. -->
 
-**Código:** [URL]  
-**Datos:** [URL, identificador o instrucciones]  
-**Licencia del código:** [Licencia]  
-**Cómo citar:** [Referencia o enlace a CITATION.cff]  
-**Versión o release:** [URL]
+**Código:** [Código](https://github.com/ItayetziC/Plant_pathogen_interaction.git)
+**Datos:** [Instrucciones de obtención](https://github.com/ItayetziC/Plant_pathogen_interaction.git)  
+**Licencia del código:** [Licencia](https://github.com/ItayetziC/Plant_pathogen_interaction/blob/main/LICENSE)  
+**Cómo citar:** [Para citar](https://github.com/ItayetziC/Plant_pathogen_interaction/blob/main/CITATION.cff)  
+**Versión o release:** [Versión](https://github.com/ItayetziC/Plant_pathogen_interaction/releases/tag/v1.2.0)
 
 ## 15. Referencias
 
@@ -419,7 +432,7 @@ https://doi.org/10.1126/science.277.5331.1453 -->
 3. Xin, X.-F., Kvitko, B., & He, S. Y. (2018). Pseudomonas syringae: what it takes to be a pathogen. Nature Reviews Microbiology, 16(5), 316–328.10.1038/nrmicro.2018.17
 4. Buell, C. R., Joardar, V., Lindeberg, M., Selengut, J., Paulsen, I. T., Gwinn, M. L., Dodson, R. J., Deboy, R. T., Durkin, A. S., Kolonay, J. F., Madupu, R., Daugherty, S., Brinkac, L., Beanan, M. J., Haft, D. H., Nelson, W. C., Zafar, N., Zhou, L., Liu, J., Yuan, Q., Khouri, H., Fedorova, N., Tran, B., Russell, D., Berry, K., Utterback, T., Van Aken, S. E., Feldblyum, T. V., D'Ascenzo, M., Deng, W.-L., Ramos, A. R., Alfano, J. R., Chatterjee, A. K., Delaney, T. P., Lazarowitz, S. G., Martin, G. B., Schneider, D. J., Tang, X., Bender, C. L., White, O., Fraser, C. M., & Collmer, A. (2003). The complete genome sequence of the Arabidopsis and tomato pathogen Pseudomonas syringae pv. tomato DC3000. Proceedings of the National Academy of Sciences (PNAS), 100(17), 10181–10186. 10.1073/pnas.1733273100
 5. Nobori T., Velasquez A. C., Wu J., Kvitko B. H., Kremer J. M., Wang Y., He S. Y. and Tsuda K.(2018). Transcriptome landscape of a bacterial pathogen under plant immunity. Proc Natl Acad Sci U S A 115(13): E3055-E3064. 10.1073/pnas.180052911
-6. Muzellec, B., Telenczuk, M., Cabeli, V., & Andreux, M. (2023). PyDESeq2: a python package for bulk RNA-seq differential expression analysis. Bioinformatics, 39(9), btad547. 10.1093/bioinformatics/btad547
+6. Colange, M., Appé, G., Meunier, L. _et al._ Differential expression analysis with inmoose, the integrated multi-omic open-source environment in Python. _BMC Bioinformatics_  26, 160 (2025). https://doi.org/10.1186/s12859-025-06180-7
 7. Cock, P. A., et al. (2009). Biopython: freely available Python tools for computational molecular biology and bioinformatics. Bioinformatics, 25(11), 1422–1423. 10.1093/bioinformatics/btp163 
 8. Waskom, M. L. (2021). seaborn: statistical data visualization. Journal of Open Source Software, 6(60), 3021. 10.21105/joss.03021
 ---

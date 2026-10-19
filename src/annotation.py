@@ -1,20 +1,78 @@
-"""Funciones para descargar la anotacion de DC3000 y unirla a la matriz."""
+"""Funciones para descargar la anotación de DC3000 y unirla a la matriz."""
 
-from contextlib import closing
+from __future__ import annotations
+
+from collections.abc import Iterable
 from pathlib import Path
 
 import pandas as pd
 from Bio import Entrez, SeqIO
+from Bio.SeqRecord import SeqRecord
+
+from geo_download import entrez_query
 
 
-def validate_nuccore_accessions(accessions):
-    """Comprueba que cada acceso exista en NCBI y sea de DC3000."""
-    # esummary pide la ficha de varios registros a la vez
-    with closing(
-        Entrez.esummary(db="nuccore", id=",".join(accessions))
-    ) as handle:
-        summaries = Entrez.read(handle)
-    # NCBI debe devolver una ficha por acceso
+def _read_genbank(path: str | Path) -> SeqRecord:
+    """Lee un archivo GenBank con un solo registro.
+
+    Parameters
+    ----------
+    path : str or pathlib.Path
+        Ruta del archivo ``.gb``.
+
+    Returns
+    -------
+    Bio.SeqRecord.SeqRecord
+        Registro leído.
+
+    Raises
+    ------
+    FileNotFoundError
+        Si el archivo no existe.
+    ValueError
+        Si el archivo no tiene formato GenBank válido.
+    """
+    try:
+        return SeqIO.read(path, "genbank")
+    except FileNotFoundError as error:
+        raise FileNotFoundError(
+            f"No existe: {path}. Solución: ejecuta antes download_genbank()."
+        ) from error
+    except ValueError as error:
+        raise ValueError(
+            f"{path} no es un GenBank válido ({error}). Solución: bórralo "
+            "y vuelve a descargarlo."
+        ) from error
+
+
+def validate_nuccore_accessions(accessions: list[str]) -> list[str]:
+    """Comprueba que cada acceso exista en NCBI y sea de DC3000.
+
+    Parameters
+    ----------
+    accessions : list of str
+        Accesos de nuccore, con o sin versión.
+
+    Returns
+    -------
+    list of str
+        Accesos con la versión vigente, p. ej. ``"NC_004578.1"``.
+
+    Raises
+    ------
+    TypeError
+        Si ``accessions`` no es una lista de texto.
+    ValueError
+        Si falta algún registro o alguno no es de DC3000.
+    """
+    if not isinstance(accessions, list) or not all(
+        isinstance(acc, str) for acc in accessions
+    ):
+        raise TypeError("accessions debe ser una lista de str")
+    # una sola consulta para todos los accesos reduce llamadas a NCBI
+    summaries = entrez_query(
+        Entrez.esummary, db="nuccore", id=",".join(accessions)
+    )
     if len(summaries) != len(accessions):
         raise ValueError(
             f"Se pidieron {len(accessions)} accesos y NCBI devolvió "
@@ -25,51 +83,81 @@ def validate_nuccore_accessions(accessions):
         title = str(record["Title"])
         version = str(record["AccessionVersion"])
         print(version, "|", title[:80])
-        # debe ser de la cepa correcta
+        # un acceso mal escrito puede existir pero ser de otro organismo
         if "DC3000" not in title:
             raise ValueError(f"{version} no parece ser DC3000: {title}")
         valid.append(version)
     return valid
 
 
-def download_genbank(accession, folder):
-    """Descarga un registro GenBank y comprueba que el formato sea valido."""
+def download_genbank(accession: str, folder: str | Path) -> Path:
+    """Descarga un registro GenBank y comprueba que tenga CDS.
+
+    Parameters
+    ----------
+    accession : str
+        Acceso de nuccore con versión.
+    folder : str or pathlib.Path
+        Carpeta destino; se crea si no existe.
+
+    Returns
+    -------
+    pathlib.Path
+        Ruta del archivo ``.gb``.
+
+    Raises
+    ------
+    ValueError
+        Si el archivo no es GenBank válido o no contiene CDS.
+    """
     folder = Path(folder)
     folder.mkdir(parents=True, exist_ok=True)
     destination = folder / f"{accession}.gb"
-    # si ya existe, no se descarga otra vez
+    # evita repetir una consulta pesada a NCBI si ya se tiene el archivo
     if destination.exists() and destination.stat().st_size > 0:
         print(f"Ya existe: {destination}")
     else:
-        # efetch descarga el registro completo en formato GenBank
-        with closing(
-            Entrez.efetch(
-                db="nuccore",
-                id=accession,
-                rettype="gbwithparts",
-                retmode="text",
-            )
-        ) as handle:
-            text = handle.read()
+        # gbwithparts incluye las CDS; "gb" a secas puede omitirlas
+        text = entrez_query(
+            Entrez.efetch, parse=False, db="nuccore", id=accession,
+            rettype="gbwithparts", retmode="text",
+        )
         destination.write_text(text, encoding="utf-8")
         print(f"Descargado: {destination}")
-    # si el formato no es GenBank valido, SeqIO lanza error
-    record = SeqIO.read(destination, "genbank")
+    record = _read_genbank(destination)
     n_cds = sum(1 for feature in record.features if feature.type == "CDS")
-    # un genoma sin CDS indica una descarga incorrecta
     if n_cds == 0:
-        raise ValueError(f"{destination} no contiene CDS")
+        raise ValueError(
+            f"{destination} no contiene CDS. Solución: bórralo y vuelve a "
+            "descargarlo."
+        )
     print(f"  {record.id}: {len(record.seq)} pb, {n_cds} CDS")
     return destination
 
 
-def extract_cds(paths):
-    """Lee los archivos GenBank y devuelve una fila por CDS."""
+def extract_cds(paths: Iterable[str | Path]) -> pd.DataFrame:
+    """Lee archivos GenBank y devuelve una fila por CDS.
+
+    Parameters
+    ----------
+    paths : iterable of str or pathlib.Path
+        Rutas de los archivos ``.gb``.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Columnas ``locus_tag``, ``old_locus_tag``, ``gene``, ``product``,
+        ``note``, ``replicon``, ``start``, ``end`` y ``strand``.
+
+    Raises
+    ------
+    ValueError
+        Si no se encontró ninguna CDS.
+    """
     rows = []
     for path in paths:
-        record = SeqIO.read(path, "genbank")
+        record = _read_genbank(path)
         for feature in record.features:
-            # solo interesan los genes codificantes
             if feature.type != "CDS":
                 continue
             quals = feature.qualifiers
@@ -81,31 +169,56 @@ def extract_cds(paths):
                     "product": quals.get("product", [None])[0],
                     "note": "; ".join(quals.get("note", [])),
                     "replicon": record.id,
-                    # inicio desde 1, como en los archivos GenBank
+                    # Biopython cuenta desde 0; GenBank y NCBI desde 1
                     "start": int(feature.location.start) + 1,
                     "end": int(feature.location.end),
-                    # 1 = hebra directa, -1 = reversa
                     "strand": feature.location.strand,
                 }
             )
+    if not rows:
+        raise ValueError("No se encontraron CDS en los archivos dados")
     return pd.DataFrame(rows)
 
 
-def merge_with_matrix(annotation, ids_table):
-    """Une GenBank con la matriz (prueba old_locus_tag y locus_tag)."""
+def merge_with_matrix(annotation: pd.DataFrame,
+                      ids_table: pd.DataFrame) -> pd.DataFrame:
+    """Une GenBank con la matriz por ``old_locus_tag`` o ``locus_tag``.
+
+    Parameters
+    ----------
+    annotation : pandas.DataFrame
+        Salida de :func:`extract_cds`.
+    ids_table : pandas.DataFrame
+        Tabla con la columna ``locus_key``.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Anotación de los genes con pareja, indexada por ``locus_key``.
+
+    Raises
+    ------
+    TypeError
+        Si alguna entrada no es DataFrame.
+    ValueError
+        Si faltan columnas necesarias.
+    """
+    for table, name in ((annotation, "annotation"), (ids_table, "ids_table")):
+        if not isinstance(table, pd.DataFrame):
+            raise TypeError(f"{name} debe ser DataFrame")
+    if "locus_key" not in ids_table.columns:
+        raise ValueError("A ids_table le falta la columna locus_key")
     annotation = annotation.copy()
-    # claves sin guion bajo, igual que en la matriz
     for column in ("locus_tag", "old_locus_tag"):
         annotation["key_" + column] = annotation[column].str.replace(
             "_", "", regex=False
         )
-    # diccionario: clave -> fila de la anotacion (primero el codigo antiguo)
+    # la matriz usa el codigo antiguo; locus_tag solo es respaldo
     mapping = {}
     for column in ("key_old_locus_tag", "key_locus_tag"):
         for key, row in zip(annotation[column], annotation.index):
             if isinstance(key, str):
                 mapping.setdefault(key, row)
-    # fila de anotacion de cada gen (NaN si no hay)
     positions = ids_table["locus_key"].map(mapping)
     n_found = int(positions.notna().sum())
     print(
@@ -113,7 +226,6 @@ def merge_with_matrix(annotation, ids_table):
         f"de {len(ids_table)}"
     )
     missing = ids_table.loc[positions.isna(), "locus_key"]
-    # si hay, muestra ejemplos para diagnosticar
     if len(missing) > 0:
         print("Sin anotación (ejemplos):", list(missing.head(10)))
     columns = [
@@ -121,23 +233,44 @@ def merge_with_matrix(annotation, ids_table):
         "replicon", "start", "end", "strand",
     ]
     merged = annotation.loc[positions.dropna().astype(int), columns].copy()
-    # indexa por locus_key de la matriz
     merged.index = ids_table.loc[positions.notna(), "locus_key"].values
     merged.index.name = "locus_key"
     return merged
 
 
-def combine_annotation(annotation, ids_table):
-    """Une GenBank con la descripcion de la matriz, una fila por gen."""
-    # base: un gen por fila, con la descripcion que traia la matriz
+def combine_annotation(annotation: pd.DataFrame,
+                       ids_table: pd.DataFrame) -> pd.DataFrame:
+    """Combina GenBank con la descripción de la matriz, una fila por gen.
+
+    Parameters
+    ----------
+    annotation : pandas.DataFrame
+        Salida de :func:`merge_with_matrix`.
+    ids_table : pandas.DataFrame
+        Tabla con ``locus_key``, ``locus_tag`` y ``description``.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Una fila por gen con ``final_product`` (GenBank si existe; si
+        no, la matriz) y ``source``.
+
+    Raises
+    ------
+    ValueError
+        Si faltan columnas o la unión cambia el número de genes.
+    """
+    needed = ["locus_key", "locus_tag", "description"]
+    if not set(needed) <= set(ids_table.columns):
+        raise ValueError(f"ids_table debe tener las columnas {needed}")
     base = ids_table.set_index("locus_key")[["locus_tag", "description"]]
+    # sufijos de origen para no confundir las dos fuentes en el informe
     base = base.rename(
         columns={
             "locus_tag": "locus_tag_matrix",
             "description": "description_matrix",
         }
     )
-    # nombres de columna que dejan claro de donde viene cada dato
     genbank = annotation.rename(
         columns={
             "locus_tag": "locus_tag_refseq",
@@ -149,21 +282,18 @@ def combine_annotation(annotation, ids_table):
         "locus_tag_refseq", "gene", "product_genbank", "note_genbank",
         "replicon", "start", "end", "strand",
     ]
-    # sin pareja en GenBank queda vacio (NaN)
+    # left: los genes sin pareja en GenBank se conservan con NaN
     table = base.join(genbank[columns], how="left")
-    # la union no debe crear ni perder genes
     if len(table) != len(ids_table):
         raise ValueError("La unión cambió el número de genes")
-    # producto final: GenBank si existe; si no, la matriz
+    # GenBank primero porque RefSeq es la anotación más reciente
     table["final_product"] = table["product_genbank"].fillna(
         table["description_matrix"]
     )
-    # fuente del producto final, para el informe
     has_genbank = table["product_genbank"].notna()
     table["source"] = has_genbank.map(
         {True: "GenBank (RefSeq)", False: "Count matrix"}
     )
-    # concordancia entre fuentes en los genes que tienen ambas
     both = has_genbank & table["description_matrix"].notna()
     same = (
         table.loc[both, "product_genbank"].str.lower().str.strip()

@@ -411,7 +411,7 @@ def validate_count_matrix(path: str | Path) -> pd.DataFrame:
         )
     if n_nan or n_duplicated:
         warnings.warn(
-            "Hay NaN o IDs duplicados; clean_and_filter() los rechazará.",
+            "Hay NaN o IDs duplicados; build_count_table() los rechazará.",
             UserWarning,
         )
     return matrix

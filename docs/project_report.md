@@ -12,7 +12,7 @@ Escherichia coli. -->
 | Integrante 2 | Leilani Cruz Ramírez leilanic@lcg.unam.mx |
 | Integrante 3 | Andrómeda Coral Gutiérrez andcoral@lcg.unam.mx |
 | Fecha de creación | 25/08/2026 |
-| Última actualización | 18/10/2026 |
+| Última actualización | 19/10/2026 |
 | Repositorio | https://github.com/ItayetziC/Plant_pathogen_interaction |
 
 <!-- AYUDA: Mantengan actualizados el estado, la fecha y la versión. La versión
@@ -302,7 +302,14 @@ EJEMPLO: En GFF3, seqid identifica la secuencia; type indica gene, CDS, etc. -->
 
 | Archivo o conjunto | Campo/columna | Tipo | Descripción | Valores o unidades |
 |:--|:--|:--|:--|:--|
-| [Archivo] | [Campo] | [Tipo] | [Descripción] | [Valores] |
+| `GSE103441_count.txt.gz` (GEO) | Primera columna (ID de gen) | Texto | Locus tag antiguo unido a la descripción del producto con un guion | `PSPTO_0001-chromosomal replication initiation protein` |
+| `GSE103441_count.txt.gz` | Columnas de muestra | Entero ≥ 0 | Conteos crudos por gen; el nombre indica condición y réplica | `Pto_col_A13` (planta), `Pto_KB_A81` (King's B); lecturas. 5,618 genes × 114 muestras |
+| GenBank `.gb` (NC_004578.1, NC_004633.1, NC_004632.1) | `CDS` y su ubicación | Rasgo | Región codificante con coordenadas y hebra | `CDS 339..1874`; `complement(...)` = hebra − |
+| GenBank `.gb` | `/old_locus_tag` | Texto | Locus tag antiguo; clave para unir con la matriz | `PSPTO0001` |
+| GenBank `.gb` | `/product` | Texto | Producto proteico anotado | `chromosomal replication initiator protein DnaA` |
+| `sample_metadata.csv` | `condition` | Categórico | Condición de cada muestra elegida | `plant` (n=13), `culture` (n=2) |
+| `final_annotation.csv` | `locus_key` | Texto | Locus tag sin guion bajo; une conteos y anotación | `PSPTO0001`; 5,394 genes |
+| `final_annotation.csv` | `final_product`, `source` | Texto / categórico | Producto final y su fuente (GenBank si existe; si no, la matriz) | `GenBank (RefSeq)` 5,152; `Count matrix` 242 |
 
 ## 9. Metodología
 
@@ -343,12 +350,12 @@ visualización. -->
 
 | Herramienta | Versión | Propósito |
 |:--|:--|:--|
-| Python | 3.13 (o posterior) | Para la ejecución de código |
+| Python | 3.14.7 | Para la ejecución de código |
 | Jupyter Notebook | 7.6.3 | Dividir el código en partes |
-| Biopython | 1.88 | Acceder a Entrez |  
+| Biopython | 1.86 | Acceder a Entrez | 
 | Pandas | 3.0.6 | Manipulación y análisis de datos tabulares |
-| Matplotlib.pyplot | 3.11.1 | Crear y modificar gráficos
-| Numpy | 2.5.4 | Manejo de datos y cálculos numéricos
+| Matplotlib.pyplot | 3.11.2 | Crear y modificar gráficos
+| Numpy | 2.5.2 | Manejo de datos y cálculos numéricos
 
 
 

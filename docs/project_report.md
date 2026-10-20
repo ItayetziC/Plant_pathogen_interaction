@@ -203,6 +203,10 @@ tecnologías.
 EJEMPLO: Un programa modular recibirá identificadores, descargará archivos,
 extraerá genes, almacenará resultados y generará visualizaciones. -->
 
+1. Existe variación entre las muestras de la condición _in planta_ debido a la diferencia de la profundidad de las lecturas, es por ello que se implementará inmoose, donde internamente normaliza los datos antes de hacer el DEG.
+2. La reducida cantidad de muestras control en el dataset, se puede solucionar de diferentes formas (aún sigue en evaluación la más óptima):
+   a) Con datos externos: Complementar los datos del cultivo KB con datos obtenidos en algún otro estudio.
+   b) Con datos del artículo: Complementar los datos de bacteria WT en KB, con datos de cepas mutadas de bacteria en KB [13 vs 10], pero se tendría que cambiar el enfoque 		 de la pregunta y objetivo de investigación.
 
 ### 7.1 Resultado o producto esperado
 
@@ -275,18 +279,20 @@ que no se guarde en Git.
 EJEMPLO: data/raw conserva originales y data/processed los derivados. -->
 
 ```text
-proyecto/
-├── data/
-│ ├── raw/
-│ └── processed/
-├── docs/
-├── notebooks/
-├── results/
-│ ├── figures/
-│ ├── tables/
-├── src/
-└── tests/
+Plant_pathogen_interaction/
+├── data/            # Datos descargados (raw) y derivados (processed); no versionados
+├── docs/            # Reporte y documentación
+├── notebooks/       # Análisis exploratorios
+├── results/         # Tablas y figuras generadas; no versionados 
+├── src/             # Código fuente
+├── tests/           # Pruebas
+├── CITATION.cff     # Información para citar el software
+├── LICENSE          # Licencia
+└── README.md        # Introducción y guía rápida de uso
+└── requirements.txt # Lista de librerías requeridas
 ```
+Para obtener los archivos no versionados: 
+Ejecutar `notebooks/01_descarga.ipynb` en orden, de la celda 0 a la 13 (con las dependencias descritas en el README en reproducción de resultados) . Las carpetas `data/raw/`, `data/processed/` y `results/` se crean automáticamente si no existen.
 
 ### 8.4 Diccionario o formato de los datos
 
@@ -316,14 +322,24 @@ actualícenla con lo que realmente ejecutaron, incluidos parámetros y decisione
 de resultados. Relacionen cada etapa con una pregunta u objetivo.
 EJEMPLO: descarga, validación, transformación, análisis, visualización y pruebas. -->
 
-1. -   Preparación de Datos: 
-	- Descarga y limpieza de matriz de conteo de expresión de genes condiciones de infección de _Pseudomonas syringae_ (_in planta_) frente a controles de crecimiento no infectivo (_in vitro_).
-	- Descarga y valida los registros de GenBank para la anotación funcional de la bacteria, a partir del genoma secuenciado por Buell et al. (2003).
-	- Control de calidad de datos por medio de un PCA de las muestras obtenidas.
 
-2. Análisis de expresión diferencial.
+El análisis se organiza en seis etapas. Las primeras tres preparan y validan los datos. Las últimas tres producen las respuestas a las preguntas de investigación.
 
-3. Interpretación biológica de los resultados.
+**Etapa 1. Entrada.** El análisis parte de dos fuentes independientes. La primera es la matriz de conteos crudos de expresión de genes condiciones de infección de _Pseudomonas syringae_ (_in planta_) frente a controles de crecimiento no infectivo (_in vitro_) presente en la serie GSE103441 de GEO, con 114 muestras de RNA-seq bacteriano.  La segunda es el genoma anotado de *P. syringae* pv. tomato DC3000, compuesto por el cromosoma y sus dos plásmidos.
+
+**Etapa 2. Preparación.** De las 114 muestras se seleccionan 15. Son las de la cepa silvestre en las dos condiciones que define el objetivo: 13 recuperadas de *A. thaliana* Col-0 y 2 crecidas en medio King's B. Archivos de GenBank en una tabla que asocia cada identificador con el producto de su gen. 
+
+**Etapa 3. Control de calidad.** Se verifica la profundidad y la mediana de conteos de cada muestra. Se calcula un PCA que, sin recibir las etiquetas de condición, separa los dos grupos en el primer componente con un 43.8 % de la varianza. 
+
+**Etapa 4. Análisis.** Los conteos crudos de las 15 muestras se modelarán con InMoose. 
+
+**Etapa 5. Integración.** La tabla de resultados del modelo se unirá con la anotación funcional mediante el identificador de cada gen, dando como resultado una sola tabla que contiene, por gen, su magnitud de cambio, su significancia y la función de su producto. 
+
+**Etapa 6. Interpretación.** De la tabla integrada se derivan tres salidas, una por cada pregunta:
+	El volcano plot y el heatmap visualizan la magnitud y la dirección de los cambios, y completan la respuesta a la **Pregunta 1** (descriptiva). 
+	El análisis de enriquecimiento identifica qué funciones biológicas aparecen sobrerrepresentadas entre los genes diferencialmente expresados, y responde la **Pregunta 2** (funcional). 
+	El filtrado de los genes anotados como proteína hipotética que resultan inducidos durante la infección responde la **Pregunta 3** (exploratoria), al priorizar candidatos para caracterización funcional posterior.
+
 
 ### 9.2 Herramientas y tecnologías
 
@@ -345,12 +361,8 @@ visualización. -->
 
 ### 9.3 Estrategia de validación
 
-<!-- AYUDA: Expliquen cómo comprobarán código y resultados: pruebas unitarias,
-datos conocidos, comparación con otra herramienta o revisión manual.
-EJEMPLO: Se compararán cinco anotaciones conocidas y se probarán entradas
-válidas, identificadores inexistentes y archivos incompletos. -->
-
-[Describan aquí la validación.]
+Validación de datos: las 48 excepciones que verifican entradas, identificadores inexistentes y archivos incompletos que se encuentran presentes en los scripts.
+Validación de muestras: el PCA confirmó la separación esperada y descartó réplicas atípicas; los análisis preliminares determinaron que se puede comparar por profundidad de las lecturas entre muestras a pesar de la dispersión in planta.
 
 ## 10. Plan de trabajo
 
@@ -422,7 +434,7 @@ EJEMPLO: Código en GitHub bajo MIT; cita disponible en CITATION.cff. -->
 **Datos:** [Instrucciones de obtención](https://github.com/ItayetziC/Plant_pathogen_interaction.git)  
 **Licencia del código:** [Licencia](https://github.com/ItayetziC/Plant_pathogen_interaction/blob/main/LICENSE)  
 **Cómo citar:** [Para citar](https://github.com/ItayetziC/Plant_pathogen_interaction/blob/main/CITATION.cff)  
-**Versión o release:** [Versión](https://github.com/ItayetziC/Plant_pathogen_interaction/releases/tag/v1.2.0)
+**Versión o release:** [Versión](https://github.com/ItayetziC/Plant_pathogen_interaction/releases/tag/v1.2.1)
 
 ## 15. Referencias
 

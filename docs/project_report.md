@@ -203,7 +203,13 @@ tecnologías.
 EJEMPLO: Un programa modular recibirá identificadores, descargará archivos,
 extraerá genes, almacenará resultados y generará visualizaciones. -->
 
-[Describan aquí la solución propuesta.]
+Con datos externos:
+  - Complementar los datos del cultivo KB con datos obtenidos en algun otro estudio (Hay que encontrar los datos. Es muy probable que varíen las condiciones de tomado de las muestras)
+
+Con datos del artículo:
+  - Complementar los datos de bacteria WT en KB, con datos de cepas mutadas de bacteria en KB [13 vs 10] (Checar si también hay que complementar inplanta con las mismas cepas [34 vs 10]). 
+  - Cambiar las condiciones a comparar (bacteria WT in planta, vs bacteria mutada in planta [13 vs 16]). (Preguntarse la relevancia del factor mutado)
+
 
 ### 7.1 Resultado o producto esperado
 

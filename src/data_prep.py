@@ -1,4 +1,4 @@
-"""Funciones para validar la matriz, seleccionar muestras y limpiar."""
+""""Funciones para validar la matriz, elegir muestras, limpiar y filtrar."""
 
 from __future__ import annotations
 
@@ -229,14 +229,15 @@ def add_gsm(meta: pd.DataFrame, samples: pd.DataFrame) -> pd.DataFrame:
     return meta
 
 
-def clean_and_filter(
+def build_count_table(
     matrix: pd.DataFrame,
     ids_table: pd.DataFrame,
     selection: pd.DataFrame,
-    min_cpm: float = 1,
-    min_samples: int = 2,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Deja las muestras elegidas, limpia IDs y quita genes sin expresión.
+    """Deja las muestras elegidas y pone ``locus_key`` como índice.
+
+    No quita genes: la matriz de salida es la que se revisa con
+    :func:`quality_control.library_metrics` antes de filtrar.
 
     Parameters
     ----------
@@ -246,24 +247,19 @@ def clean_and_filter(
         Salida de :func:`split_id_description`, en el orden de ``matrix``.
     selection : pandas.DataFrame
         Salida de :func:`select_samples`.
-    min_cpm : float, optional
-        CPM mínimo para considerar un gen expresado. Por defecto 1.
-    min_samples : int, optional
-        Muestras que deben superar ``min_cpm``. Por defecto 2, el tamaño
-        del grupo más chico.
 
     Returns
     -------
-    filtered : pandas.DataFrame
-        Conteos filtrados, indexados por ``locus_key``.
+    counts : pandas.DataFrame
+        Conteos sin filtrar de las muestras elegidas, indexados por
+        ``locus_key``.
     meta : pandas.DataFrame
-        Columna ``condition``, en el orden de las columnas de
-        ``filtered``.
+        Columna ``condition``, en el orden de las columnas de ``counts``.
 
     Raises
     ------
     TypeError
-        Si alguna tabla no es DataFrame o los umbrales no son números.
+        Si ``matrix`` no es DataFrame.
     ValueError
         Si las tablas no concuerdan o hay NaN o duplicados.
     """
@@ -271,9 +267,6 @@ def clean_and_filter(
     _require_columns(selection, ["sample", "condition"], "selection")
     if not isinstance(matrix, pd.DataFrame):
         raise TypeError("matrix debe ser DataFrame")
-    valid_cpm = isinstance(min_cpm, (int, float))
-    if not valid_cpm or not isinstance(min_samples, int):
-        raise TypeError("min_cpm debe ser número y min_samples entero")
     # el indice se reemplaza por posicion, asi que el tamaño debe coincidir
     if len(ids_table) != len(matrix):
         raise ValueError("ids_table y matrix no tienen el mismo número de "
@@ -293,13 +286,55 @@ def clean_and_filter(
         f"Muestras: {counts.shape[1]} | "
         f"Genes antes del filtro: {counts.shape[0]}"
     )
+    meta = chosen.set_index("sample")[["condition"]]
+    return counts, meta
+
+
+def filter_low_counts(counts: pd.DataFrame, min_cpm: float = 1,
+                      min_samples: int = 2) -> pd.DataFrame:
+    """Quita los genes sin expresión suficiente.
+
+    Parameters
+    ----------
+    counts : pandas.DataFrame
+        Conteos genes × muestras, salida de :func:`build_count_table`.
+    min_cpm : float, optional
+        CPM mínimo para considerar un gen expresado. Por defecto 1.
+    min_samples : int, optional
+        Muestras que deben superar ``min_cpm``. Por defecto 2, el tamaño
+        del grupo más chico.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Conteos de los genes que pasan el filtro.
+
+    Raises
+    ------
+    TypeError
+        Si ``counts`` no es DataFrame o los umbrales no son números.
+    ValueError
+        Si ``min_samples`` no cabe en el número de muestras o alguna
+        muestra no tiene conteos.
+    """
+    if not isinstance(counts, pd.DataFrame):
+        raise TypeError("counts debe ser DataFrame")
+    valid_cpm = isinstance(min_cpm, (int, float))
+    if not valid_cpm or not isinstance(min_samples, int):
+        raise TypeError("min_cpm debe ser número y min_samples entero")
+    # con mas muestras exigidas que columnas, ningun gen pasaria
+    if not 1 <= min_samples <= counts.shape[1]:
+        raise ValueError(
+            f"min_samples debe estar entre 1 y {counts.shape[1]}. "
+            "Solución: usa el tamaño del grupo más chico (2)."
+        )
     library_size = counts.sum()
-    print("\nTamaño de librería (conteos totales por muestra):")
-    print(library_size.sort_values().to_string())
+    # una muestra sin conteos daria division entre cero en el CPM
+    if (library_size == 0).any():
+        empty = list(library_size.index[library_size == 0])
+        raise ValueError(f"Muestras con 0 conteos totales: {empty}")
     # CPM y no conteos: las librerias varian ~4 veces de tamaño
     cpm = counts / library_size * 1e6
     keep = (cpm > min_cpm).sum(axis=1) >= min_samples
-    filtered = counts[keep]
-    print(f"\nGenes que pasan el filtro: {int(keep.sum())} de {len(keep)}")
-    meta = chosen.set_index("sample")[["condition"]]
-    return filtered, meta
+    print(f"Genes que pasan el filtro: {int(keep.sum())} de {len(keep)}")
+    return counts[keep]

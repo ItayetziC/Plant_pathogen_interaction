@@ -204,14 +204,14 @@ def plot_library_metrics(metrics: pd.DataFrame,
             for c in conditions
         ])
         ax.set_xlim(-0.55, len(conditions) - 0.45)
-        ax.set_title(title, fontsize=10.5)
+        ax.set_ylabel(title, fontsize=10.5)
         ax.grid(axis="y", alpha=0.25)
         ax.set_axisbelow(True)
         ax.spines[["top", "right"]].set_visible(False)
     # titulo descriptivo: la conclusion se escribe tras ver la figura
     fig.suptitle(
         f"Profundidad y mediana de conteos de las {len(metrics)} muestras "
-        "(antes del filtro)", fontsize=12
+        , fontsize=12
     )
     fig.tight_layout()
     _save_figure(fig, output_path, dpi=200)

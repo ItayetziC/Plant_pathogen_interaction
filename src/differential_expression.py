@@ -106,3 +106,121 @@ def build_dataset(counts: pd.DataFrame,
         columns=counts.index,
     )
     return DESeqDataSet(countData=matrix, clinicalData=clinical, design=design)
+
+
+def normalize(dds: DESeqDataSet) -> tuple[DESeqDataSet, pd.Series]:
+    """Calcula los factores de tamaño por el método de mediana de razones.
+
+    Parameters
+    ----------
+    dds : inmoose.deseq2.DESeqDataSet
+        Objeto construido con :func:`build_dataset`.
+
+    Returns
+    -------
+    dds : inmoose.deseq2.DESeqDataSet
+        El mismo objeto con los factores de tamaño calculados.
+    factors : pandas.Series
+        Factor de tamaño de cada muestra.
+
+    Raises
+    ------
+    RuntimeError
+        Si InMoose no pudo calcular los factores de tamaño.
+    """
+    dds = dds.estimateSizeFactors()
+    if "sizeFactor" in dds.obs:
+        factors = pd.Series(dds.obs["sizeFactor"], index=dds.obs_names)
+    elif "sizeFactors" in dds.obs:
+        factors = pd.Series(dds.obs["sizeFactors"], index=dds.obs_names)
+    else:
+        raise RuntimeError(
+            "InMoose no dejó los factores de tamaño en dds.obs. Solución: "
+            "verifica la versión instalada con 'pip show inmoose'."
+        )
+    return dds, factors.rename("factor_de_tamano")
+
+
+def estimate_dispersions(dds: DESeqDataSet) -> tuple[DESeqDataSet, pd.DataFrame]:
+    """Estima la dispersión de cada gen con encogimiento bayesiano.
+
+    Con pocas réplicas la dispersión de un gen no es estimable por sí sola,
+    así que se ajusta una tendencia con todos los genes y cada estimación
+    individual se acerca a esa curva en proporción a su confiabilidad.
+
+    Parameters
+    ----------
+    dds : inmoose.deseq2.DESeqDataSet
+        Objeto ya normalizado.
+
+    Returns
+    -------
+    dds : inmoose.deseq2.DESeqDataSet
+        El mismo objeto con las dispersiones estimadas.
+    table : pandas.DataFrame
+        Columnas ``baseMean``, ``dispGeneEst`` (estimación individual),
+        ``dispFit`` (valor de la tendencia) y ``dispersion`` (final).
+    """
+    dds = dds.estimateDispersions()
+    columnas = ["baseMean", "dispGeneEst", "dispFit", "dispersion"]
+    table = pd.DataFrame(
+        {c: np.asarray(dds.var[c]) for c in columnas if c in dds.var},
+        index=dds.var_names,
+    )
+    return dds, table
+
+
+def fit_model(dds: DESeqDataSet) -> DESeqDataSet:
+    """Ajusta el modelo lineal generalizado y aplica la prueba de Wald.
+
+    Parameters
+    ----------
+    dds : inmoose.deseq2.DESeqDataSet
+        Objeto con factores de tamaño y dispersiones ya estimados.
+
+    Returns
+    -------
+    inmoose.deseq2.DESeqDataSet
+        Objeto con los coeficientes ajustados.
+    """
+    return nbinomWaldTest(dds, quiet=True)
+
+
+def extract_results(dds: DESeqDataSet,
+                    gene_names: pd.Index,
+                    contrast: list[str] | None = None,
+                    alpha: float = 0.05) -> pd.DataFrame:
+    """Extrae la tabla de resultados del contraste de interés.
+
+    Parameters
+    ----------
+    dds : inmoose.deseq2.DESeqDataSet
+        Objeto con el modelo ya ajustado.
+    gene_names : pandas.Index
+        Identificadores de los genes, en el orden de la matriz.
+    contrast : list of str, optional
+        ``[variable, numerador, denominador]``. Por omisión compara
+        ``plant`` contra ``culture``.
+    alpha : float
+        Umbral de FDR que usa el filtrado independiente.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Columnas ``baseMean``, ``log2FoldChange``, ``lfcSE``, ``stat``,
+        ``pvalue`` y ``adj_pvalue``, indexadas por gen.
+
+    Raises
+    ------
+    ValueError
+        Si alpha está fuera del intervalo (0, 1).
+    """
+    if not 0 < alpha < 1:
+        raise ValueError("alpha debe estar entre 0 y 1")
+    if contrast is None:
+        contrast = ["condicion", "plant", "culture"]
+
+    results = pd.DataFrame(dds.results(contrast=contrast, alpha=alpha))
+    results.index = gene_names
+    results.index.name = "locus_key"
+    return results

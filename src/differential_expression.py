@@ -224,3 +224,132 @@ def extract_results(dds: DESeqDataSet,
     results.index = gene_names
     results.index.name = "locus_key"
     return results
+
+
+def classify_degs(results: pd.DataFrame,
+                  alpha: float = 0.05,
+                  lfc_min: float = 1.0) -> pd.DataFrame:
+    """Marca cada gen como inducido, reprimido o sin cambio.
+
+    Parameters
+    ----------
+    results : pandas.DataFrame
+        Tabla devuelta por :func:`extract_results`.
+    alpha : float
+        Umbral de FDR.
+    lfc_min : float
+        Cambio mínimo en log2 para considerar un gen diferencial.
+
+    Returns
+    -------
+    pandas.DataFrame
+        La misma tabla con la columna ``regulacion``.
+
+    Raises
+    ------
+    ValueError
+        Si faltan las columnas necesarias.
+    """
+    requeridas = {"log2FoldChange", "adj_pvalue"}
+    if not requeridas.issubset(results.columns):
+        raise ValueError(
+            f"Faltan columnas {requeridas - set(results.columns)}. Solución: "
+            "usa la tabla que devuelve extract_results."
+        )
+
+    results = results.copy()
+    # adj_pvalue es NaN en los genes que el filtrado independiente descartó;
+    # comparar NaN siempre da False, así que quedan como 'sin cambio'
+    significativo = (results["adj_pvalue"] < alpha) & (
+        results["log2FoldChange"].abs() > lfc_min
+    )
+    results["regulacion"] = np.where(
+        significativo & (results["log2FoldChange"] > 0), "inducido",
+        np.where(significativo, "reprimido", "sin cambio"),
+    )
+    return results
+
+
+def annotate_results(results: pd.DataFrame,
+                     annotation: pd.DataFrame,
+                     key: str = "locus_key") -> pd.DataFrame:
+    """Une los resultados con la anotación funcional del genoma.
+
+    Parameters
+    ----------
+    results : pandas.DataFrame
+        Tabla de resultados indexada por identificador de gen.
+    annotation : pandas.DataFrame
+        Anotación con la columna indicada en ``key``.
+    key : str
+        Columna de la anotación que corresponde al índice de ``results``.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Resultados con las columnas ``gene``, ``final_product`` y
+        ``replicon``, ordenados por significancia.
+
+    Raises
+    ------
+    ValueError
+        Si la anotación no tiene la columna clave o no cubre ningún gen.
+    """
+    if key not in annotation.columns:
+        raise ValueError(
+            f"La anotación no tiene la columna '{key}'. Solución: usa el "
+            "final_annotation.csv que produce el notebook 01."
+        )
+
+    columnas = [c for c in ("gene", "final_product", "replicon")
+                if c in annotation.columns]
+    anotacion = annotation.drop_duplicates(key).set_index(key)[columnas]
+
+    unidos = results.join(anotacion, how="left")
+    cubiertos = unidos["final_product"].notna().sum() if "final_product" in unidos else 0
+    if cubiertos == 0:
+        raise ValueError(
+            "Ningún gen coincidió con la anotación. Solución: revisa que los "
+            "identificadores tengan el mismo formato (PSPTO0001)."
+        )
+    return unidos.sort_values("adj_pvalue")
+
+
+def validate_controls(results: pd.DataFrame) -> pd.DataFrame:
+    """Comprueba que los genes de referencia se comporten como se espera.
+
+    Es la validación biológica del análisis: si los genes de virulencia no
+    aparecen inducidos, el problema está en el diseño o en los datos, no en
+    la interpretación.
+
+    Parameters
+    ----------
+    results : pandas.DataFrame
+        Tabla devuelta por :func:`extract_results`.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Una fila por gen control, con su log2FoldChange, su FDR y si cumple
+        lo esperado.
+    """
+    filas = []
+    for locus, nombre in {**CONTROLES_POSITIVOS, **CONTROLES_NEGATIVOS}.items():
+        esperado = "inducido" if locus in CONTROLES_POSITIVOS else "estable"
+        if locus not in results.index:
+            filas.append({"gen": nombre, "tipo": esperado, "cumple": "ausente"})
+            continue
+        lfc = results.loc[locus, "log2FoldChange"]
+        padj = results.loc[locus, "adj_pvalue"]
+        if esperado == "inducido":
+            cumple = bool(lfc > 2 and pd.notna(padj) and padj < 0.05)
+        else:
+            cumple = bool(abs(lfc) < 2)
+        filas.append({
+            "gen": nombre,
+            "tipo": esperado,
+            "log2FoldChange": round(float(lfc), 2),
+            "adj_pvalue": float(padj) if pd.notna(padj) else np.nan,
+            "cumple": "sí" if cumple else "NO",
+        })
+    return pd.DataFrame(filas)

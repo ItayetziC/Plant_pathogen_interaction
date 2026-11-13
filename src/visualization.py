@@ -110,3 +110,108 @@ def plot_volcano(results: pd.DataFrame, ax=None):
     ax.set_ylabel("-log10 (FDR)")
     ax.legend(title="")
     return ax
+
+def plot_heatmap(log_counts: pd.DataFrame,
+                 genes: pd.Index,
+                 meta: pd.DataFrame,
+                 ax=None,
+                 etiquetas: list[str] | None = None):
+    """
+    Dibuja un heatmap de los genes seleccionados.
+
+    Cada fila se estandariza por separado (puntaje z), de modo que el color
+    indica cuánto se aleja cada muestra del promedio de ese gen. Sin
+    estandarizar, los genes muy expresados dominarían toda la escala.
+
+    Las columnas se ordenan por condición y las filas por log2FoldChange,
+    sin agrupamiento, para que los bloques se lean de inmediato.
+
+    Parameters
+    ----------
+    log_counts : pandas.DataFrame
+        Expresión en log2 de conteos normalizados, genes × muestras.
+    genes : pandas.Index
+        Genes a graficar, en el orden deseado.
+    meta : pandas.DataFrame
+        Metadatos con la columna ``condition``.
+    ax : matplotlib.axes.Axes, optional
+        Ejes donde dibujar. Si no se pasan, se crean unos nuevos.
+    etiquetas : list of str, optional
+        Nombres a mostrar en las filas. Por omisión, los identificadores.
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+
+    Raises
+    ------
+    ValueError
+        Si algún gen solicitado no está en la matriz de expresión.
+    """
+    ausentes = [g for g in genes if g not in log_counts.index]
+    if ausentes:
+        raise ValueError(
+            f"{len(ausentes)} genes no están en la matriz de expresión "
+            f"(por ejemplo {ausentes[:3]})."
+        )
+
+    if ax is None:
+        _, ax = plt.subplots(figsize=(8, 10))
+
+    orden_muestras = meta.sort_values("condition").index
+    datos = log_counts.loc[genes, orden_muestras]
+
+    # puntaje z por fila: (valor - media del gen) / desviación del gen
+    z = datos.sub(datos.mean(axis=1), axis=0).div(datos.std(axis=1), axis=0)
+
+    sns.heatmap(z, cmap="RdBu_r", center=0, ax=ax,
+                yticklabels=etiquetas if etiquetas is not None else list(genes),
+                xticklabels=[s.replace("Pto_", "") for s in orden_muestras],
+                cbar_kws={"label": "puntaje z", "shrink": 0.5})
+
+    # línea que separa las dos condiciones
+    n_cultivo = int((meta["condition"] == "culture").sum())
+    ax.axvline(n_cultivo, color="black", linewidth=2)
+
+    ax.set_title(f"Los {len(genes)} genes con mayor cambio de expresión")
+    ax.set_xlabel("")
+    ax.set_ylabel("")
+    plt.setp(ax.get_yticklabels(), fontsize=8, fontstyle="italic", rotation=0)
+    plt.setp(ax.get_xticklabels(), fontsize=8, rotation=90)
+    return ax
+
+
+def select_top_degs(degs: pd.DataFrame, n_each: int = 20) -> pd.Index:
+    """
+    Elige los genes más inducidos y más reprimidos.
+
+    Parameters
+    ----------
+    degs : pandas.DataFrame
+        Subconjunto de genes diferencialmente expresados.
+    n_each : int
+        Cuántos tomar de cada dirección.
+
+    Returns
+    -------
+    pandas.Index
+        Identificadores ordenados de mayor a menor log2FoldChange.
+
+    Raises
+    ------
+    ValueError
+        Si no hay suficientes genes en alguna dirección.
+    """
+    inducidos = degs[degs["log2FoldChange"] > 0]
+    reprimidos = degs[degs["log2FoldChange"] < 0]
+    if len(inducidos) < n_each or len(reprimidos) < n_each:
+        raise ValueError(
+            f"no hay {n_each} genes en cada dirección "
+            f"({len(inducidos)} inducidos, {len(reprimidos)} reprimidos)."
+        )
+
+    seleccion = pd.concat([
+        inducidos.nlargest(n_each, "log2FoldChange"),
+        reprimidos.nsmallest(n_each, "log2FoldChange"),
+    ])
+    return seleccion.sort_values("log2FoldChange", ascending=False).index

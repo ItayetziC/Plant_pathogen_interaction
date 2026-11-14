@@ -215,3 +215,108 @@ def select_top_degs(degs: pd.DataFrame, n_each: int = 20) -> pd.Index:
         reprimidos.nsmallest(n_each, "log2FoldChange"),
     ])
     return seleccion.sort_values("log2FoldChange", ascending=False).index
+
+def plot_candidatos(results: pd.DataFrame,
+                    ax=None,
+                    n: int = 15,
+                    base_mean_minimo: float = 10.0,
+                    solo_inducidos: bool = True,
+                    patron: str = "hypothetical"):
+    """
+    Grafica los genes sin función asignada que cambian durante la infección.
+ 
+    Responde la pregunta 3: entre los genes anotados solo como proteína
+    hipotética, cuáles muestran un patrón de expresión que los vuelve
+    candidatos a caracterización funcional.
+ 
+    Se exige una expresión mínima además de la significancia, porque un
+    cambio grande en un gen apenas detectable no es evidencia sólida.
+ 
+    Parameters
+    ----------
+    results : pandas.DataFrame
+        Tabla anotada, con ``final_product``, ``log2FoldChange``,
+        ``baseMean`` y ``regulacion``.
+    ax : matplotlib.axes.Axes, optional
+        Ejes donde dibujar. Si no se pasan, se crean unos nuevos.
+    n : int
+        Cuántos candidatos mostrar.
+    base_mean_minimo : float
+        Expresión media mínima para considerar al gen.
+    solo_inducidos : bool
+        Si es True, solo muestra los inducidos in planta.
+    patron : str
+        Texto a buscar en ``final_product`` para identificar genes sin
+        función asignada.
+ 
+    Returns
+    -------
+    matplotlib.axes.Axes
+ 
+    Raises
+    ------
+    ValueError
+        Si ningún gen cumple los criterios.
+    """
+    sin_funcion = results["final_product"].fillna("").str.contains(
+        patron, case=False, regex=False
+    )
+    candidatos = results[
+        sin_funcion
+        & (results["regulacion"] != "sin cambio")
+        & (results["baseMean"] >= base_mean_minimo)
+    ]
+    if solo_inducidos:
+        candidatos = candidatos[candidatos["log2FoldChange"] > 0]
+ 
+    if candidatos.empty:
+        raise ValueError(
+            f"ningún gen cumple los criterios (patrón '{patron}', "
+            f"baseMean >= {base_mean_minimo})."
+        )
+ 
+    if solo_inducidos:
+        candidatos = candidatos.nlargest(n, "log2FoldChange")
+    else:
+        # mitad y mitad, para que ninguna dirección domine la figura
+        mitad = n // 2
+        candidatos = pd.concat([
+            candidatos[candidatos["log2FoldChange"] > 0].nlargest(mitad, "log2FoldChange"),
+            candidatos[candidatos["log2FoldChange"] < 0].nsmallest(n - mitad, "log2FoldChange"),
+        ])
+    candidatos = candidatos.sort_values("log2FoldChange")
+ 
+    if ax is None:
+        _, ax = plt.subplots(figsize=(8, 0.42 * len(candidatos) + 2))
+ 
+    colores = [COLORES["inducido"] if v > 0 else COLORES["reprimido"]
+               for v in candidatos["log2FoldChange"]]
+    posiciones = np.arange(len(candidatos))
+    ax.barh(posiciones, candidatos["log2FoldChange"], color=colores, height=0.68)
+ 
+    # la expresión media se anota al final de cada barra
+    for y, (lfc, media) in enumerate(zip(candidatos["log2FoldChange"],
+                                         candidatos["baseMean"])):
+        desplazamiento = 0.12 if lfc > 0 else -0.12
+        ax.text(lfc + desplazamiento, y, f"{media:.0f}", va="center",
+                ha="left" if lfc > 0 else "right", fontsize=8, color="#444")
+ 
+    ax.set_yticks(posiciones)
+    ax.set_yticklabels(candidatos.index, fontsize=9, fontstyle="italic")
+    ax.axvline(0, color="black", linewidth=1)
+    ax.set_xlabel("log2 (in planta / King's B)")
+    direccion = "inducidos" if solo_inducidos else "con cambio de expresión"
+    ax.set_title(
+        f"Genes sin función asignada {direccion} durante la infección\n"
+        f"(FDR < {ALPHA}, expresión media >= {base_mean_minimo:.0f}; "
+        f"la cifra junto a cada barra es la expresión media)",
+        fontsize=10.5,
+    )
+    margen = candidatos["log2FoldChange"].abs().max() * 0.22
+    ax.set_xlim(min(0, candidatos["log2FoldChange"].min() - margen),
+                max(0, candidatos["log2FoldChange"].max() + margen))
+    ax.grid(axis="x", alpha=0.25)
+    ax.set_axisbelow(True)
+    for lado in ("top", "right"):
+        ax.spines[lado].set_visible(False)
+    return ax

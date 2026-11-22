@@ -177,3 +177,145 @@ def summarize_t3ss_genes(classified_df):
 
     return summary_df
 
+def extract_genomic_region(
+    genbank_file,
+    start_locus=1369,
+    end_locus=1406
+):
+    """
+    Extrae los genes CDS de una región del cromosoma
+    utilizando sus identificadores PSPTO.
+
+    Se consideran tanto locus_tag como old_locus_tag
+    para recuperar los identificadores históricos.
+    """
+
+    # Leer el archivo GenBank del cromosoma
+    record = SeqIO.read(genbank_file, "genbank")
+
+    genomic_genes = []
+
+    # Recorrer las características anotadas
+    for feature in record.features:
+
+        if feature.type != "CDS":
+            continue
+
+        current_locus = feature.qualifiers.get(
+            "locus_tag", [""]
+        )[0]
+
+        previous_loci = feature.qualifiers.get(
+            "old_locus_tag", []
+        )
+
+        # Revisar identificadores actuales y anteriores
+        locus_ids = [current_locus] + previous_loci
+
+        for locus_id in locus_ids:
+
+            match = re.fullmatch(
+                r"PSPTO(\d+)",
+                locus_id
+            )
+
+            if match is None:
+                continue
+
+            locus_number = int(match.group(1))
+
+            if start_locus <= locus_number <= end_locus:
+
+                genomic_genes.append({
+                    "locus_key": locus_id,
+                    "current_locus": current_locus,
+                    "start": int(feature.location.start) + 1,
+                    "end": int(feature.location.end),
+                    "strand": feature.location.strand,
+                    "genbank_product": feature.qualifiers.get(
+                        "product", ["Sin anotación"]
+                    )[0]
+                })
+
+                break
+
+    # Construir la tabla del contexto genómico
+    genomic_context_df = pd.DataFrame(
+        genomic_genes,
+        columns=[
+            "locus_key",
+            "current_locus",
+            "start",
+            "end",
+            "strand",
+            "genbank_product"
+        ]
+    )
+
+    if genomic_context_df.empty:
+        raise ValueError(
+            "No se encontraron genes en la región solicitada."
+        )
+
+    return genomic_context_df.sort_values(
+        "start"
+    ).reset_index(drop=True)
+
+
+def prepare_genomic_context(
+    genomic_context_df,
+    expression_df,
+    target_locus="PSPTO1385",
+    flank_genes=3
+):
+    """
+    Integra las coordenadas genómicas de un gen y sus vecinos
+    con los resultados de expresión diferencial.
+
+    Selecciona los genes vecinos según su posición cromosómica.
+    """
+
+    # Ordenar los genes por sus coordenadas
+    context_df = genomic_context_df.sort_values(
+        "start"
+    ).reset_index(drop=True)
+
+    # Localizar el gen de interés
+    positions = context_df.index[
+        context_df["locus_key"] == target_locus
+    ].tolist()
+
+    if not positions:
+        raise ValueError(
+            f"No se encontró el gen {target_locus}."
+        )
+
+    target_position = positions[0]
+
+    # Seleccionar los genes vecinos
+    region_df = context_df.iloc[
+        max(0, target_position - flank_genes):
+        target_position + flank_genes + 1
+    ].copy()
+
+    # Incorporar la información de expresión diferencial
+    expression_columns = [
+        "locus_key",
+        "log2FoldChange",
+        "adj_pvalue",
+        "regulacion"
+    ]
+
+    region_df = region_df.merge(
+        expression_df[expression_columns],
+        on="locus_key",
+        how="left",
+        validate="one_to_one"
+    )
+
+    # Identificar el gen de interés
+    region_df["is_target"] = (
+        region_df["locus_key"] == target_locus
+    )
+
+    return region_df.sort_values("start").reset_index(drop=True)

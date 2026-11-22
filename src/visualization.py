@@ -400,3 +400,219 @@ def plot_kegg_enrichment(results_df, title, ax=None):
 
     return ax
 
+
+def plot_t3ss_categories(summary_df, ax=None):
+    """
+    Genera una gráfica de barras horizontales apiladas
+    para representar la clasificación funcional del T3SS.
+
+    Parámetros
+    ----------
+    summary_df : pandas.DataFrame
+        Tabla con el número de genes inducidos y reprimidos
+        por categoría funcional.
+
+    ax : matplotlib.axes.Axes, opcional
+        Eje donde se dibujará la gráfica.
+
+    Retorna
+    -------
+    matplotlib.axes.Axes
+        Eje con la gráfica generada.
+    """
+
+    # Crear una copia de la tabla
+    plot_df = summary_df.copy()
+
+    # Asegurar que ambas categorías de regulación estén presentes
+    for column in ["inducido", "reprimido"]:
+        if column not in plot_df.columns:
+            plot_df[column] = 0
+
+    # Ordenar las categorías funcionales
+    category_order = [
+        "Efectores",
+        "Componentes estructurales y exportacion",
+        "Chaperonas",
+        "Reguladores"
+    ]
+
+    plot_df = plot_df.reindex(category_order, fill_value=0)
+
+    # Crear la figura cuando no se proporciona un eje
+    if ax is None:
+        _, ax = plt.subplots(figsize=(10, 5))
+
+    # Dibujar las barras horizontales apiladas
+    ax.barh(
+        plot_df.index,
+        plot_df["inducido"],
+        label="Inducidos",
+        color="#4C78A8"
+    )
+
+    ax.barh(
+        plot_df.index,
+        plot_df["reprimido"],
+        left=plot_df["inducido"],
+        label="Reprimidos",
+        color="#E45756"
+    )
+
+    # Agregar el total de genes al final de cada barra
+    for index, (_, row) in enumerate(plot_df.iterrows()):
+        total = row["inducido"] + row["reprimido"]
+
+        ax.text(
+            total + 0.3,
+            index,
+            str(int(total)),
+            va="center"
+        )
+
+    # Configurar las etiquetas
+    ax.set_xlabel("Número de genes diferencialmente expresados")
+    ax.set_ylabel("Categoría funcional")
+    ax.set_title("Clasificación funcional de genes relacionados con T3SS")
+
+    ax.legend(title="Regulación")
+    ax.invert_yaxis()
+    ax.set_xlim(0, plot_df.sum(axis=1).max() + 4)
+
+    return ax
+
+
+def plot_genomic_context(context_df, target_locus="PSPTO1385", ax=None):
+    """
+    Representa el contexto genómico de un candidato mediante
+    flechas que indican la posición, orientación y regulación.
+    """
+
+    if context_df.empty:
+        raise ValueError("No hay genes para representar.")
+
+    # Crear la figura
+    if ax is None:
+        _, ax = plt.subplots(figsize=(13, 4.5))
+
+    # Definir los colores según la regulación
+    regulation_colors = {
+        "inducido": "#D95F02",
+        "reprimido": "#1B9E77",
+        "sin cambio": "#A0A0A0"
+    }
+
+    region_start = context_df["start"].min()
+    region_end = context_df["end"].max()
+
+    # Dibujar la línea que representa el cromosoma
+    ax.plot(
+        [region_start, region_end],
+        [0, 0],
+        color="gray",
+        linewidth=1.5,
+        zorder=1
+    )
+
+    # Representar cada gen
+    for _, gene in context_df.iterrows():
+
+        start = gene["start"]
+        end = gene["end"]
+        strand = gene["strand"]
+
+        # Determinar la dirección de transcripción
+        if strand == 1:
+            x = start
+            dx = end - start
+        elif strand == -1:
+            x = end
+            dx = start - end
+        else:
+            continue
+
+        regulation = gene["regulacion"]
+
+        color = regulation_colors.get(
+            regulation,
+            "#A0A0A0"
+        )
+
+        is_target = gene["locus_key"] == target_locus
+
+        # Crear la flecha que representa el gen
+        arrow = FancyArrow(
+            x,
+            0,
+            dx,
+            0,
+            width=0.20,
+            head_width=0.32,
+            head_length=min(70, abs(dx) * 0.3),
+            length_includes_head=True,
+            facecolor=color,
+            edgecolor="black" if is_target else "none",
+            linewidth=2 if is_target else 0,
+            zorder=3
+        )
+
+        ax.add_patch(arrow)
+
+        # Calcular el centro del gen
+        center = (start + end) / 2
+
+        # Mostrar el identificador
+        ax.text(
+            center,
+            0.24,
+            gene["locus_key"],
+            ha="center",
+            va="bottom",
+            fontsize=9,
+            rotation=45
+        )
+
+        # Mostrar el cambio de expresión
+        if pd.notna(gene["log2FoldChange"]):
+            ax.text(
+                center,
+                -0.28,
+                f'{gene["log2FoldChange"]:+.2f}',
+                ha="center",
+                va="top",
+                fontsize=9
+            )
+
+    # Configurar los ejes
+    ax.set_xlim(region_start - 150, region_end + 150)
+    ax.set_ylim(-0.65, 0.95)
+    ax.set_yticks([])
+
+    ax.set_xlabel("Posicion en el cromosoma (pb)")
+    ax.set_title(
+        f"Contexto genomico y expresion diferencial de {target_locus}",
+        pad=18
+    )
+
+    # Crear la leyenda
+    legend_items = [
+        Patch(facecolor="#D95F02", label="Inducido"),
+        Patch(facecolor="#1B9E77", label="Reprimido"),
+        Patch(facecolor="#A0A0A0", label="Sin cambio o sin datos"),
+        Patch(
+            facecolor="white",
+            edgecolor="black",
+            linewidth=2,
+            label=target_locus
+        )
+    ]
+
+    ax.legend(
+        handles=legend_items,
+        loc="upper right",
+        frameon=False
+    )
+
+    ax.ticklabel_format(style="plain", axis="x")
+
+    return ax

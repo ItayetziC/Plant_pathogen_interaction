@@ -19,6 +19,8 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
+from matplotlib.patches import FancyArrow, Patch
+
 ALPHA = 0.05
 LFC_CORTE = 1.0
 COLUMNAS_REQUERIDAS = ["log2FoldChange", "adj_pvalue", "regulacion"]
@@ -320,3 +322,81 @@ def plot_candidatos(results: pd.DataFrame,
     for lado in ("top", "right"):
         ax.spines[lado].set_visible(False)
     return ax
+
+def plot_kegg_enrichment(results_df, title, ax=None):
+    """
+    Genera un dot plot de rutas KEGG significativamente enriquecidas.
+
+    Parametros
+    ----------
+    results_df : pandas.DataFrame
+        Resultados del analisis ORA.
+    title : str
+        Titulo de la grafica.
+    ax : matplotlib.axes.Axes, opcional
+        Eje sobre el que se dibujar la grafica.
+
+    Retorna
+    -------
+    matplotlib.axes.Axes
+        Eje que contiene la grafica.
+    """
+    # Seleccionar las rutas significativamente enriquecidas
+    significant_df = results_df.loc[
+        results_df["padj"] < 0.05
+    ].copy()
+
+    # Simplificar los nombres de las rutas para la visualizacion
+    significant_df["short_pathway_name"] = (
+        significant_df["pathway_name"]
+        .str.split(" - ").str[0]
+    )
+
+    if ax is None:
+        _, ax = plt.subplots(figsize=(10, 5))
+
+    if significant_df.empty:
+        ax.text(
+            0.5, 0.5,
+            "No se identificaron rutas significativas",
+            ha="center",
+            va="center",
+            transform=ax.transAxes
+        )
+        ax.set_axis_off()
+        return ax
+
+    # Calcular la significancia en escala logaritmica
+    significant_df["neg_log10_padj"] = (
+        -np.log10(significant_df["padj"].clip(lower=1e-300))
+    )
+
+    # Ordenar las rutas por significancia
+    significant_df = significant_df.sort_values(
+        "neg_log10_padj"
+    )
+
+    # Representar las rutas mediante un grafico de puntos
+    scatter = ax.scatter(
+        significant_df["overlap_count"],
+        significant_df["short_pathway_name"],
+        s=significant_df["overlap_count"] * 12,
+        c=significant_df["neg_log10_padj"],
+        cmap="viridis",
+        alpha=0.85,
+        edgecolors="black",
+        linewidths=0.5
+    )
+
+    ax.set_xlabel("Numero de DEGs asociados a la ruta")
+    ax.set_ylabel("Ruta KEGG")
+    ax.set_title(title)
+
+    plt.colorbar(
+        scatter,
+        ax=ax,
+        label="-log10(FDR)"
+    )
+
+    return ax
+

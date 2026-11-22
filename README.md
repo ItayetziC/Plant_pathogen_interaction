@@ -119,6 +119,8 @@ Al terminar el notebook se habrán generado los siguientes archivos:
 | processed/sample_metadata.csv |	Condición experimental y código GSM de cada muestra seleccionada |
 | processed/genbank_annotation_DC3000.csv	| Anotación extraída de los registros GenBank |
 | processed/final_annotation.csv	| Anotación funcional por gen, combinando GenBank y la matriz |
+| data/processed/genbank_annotation_DC3000	.csv	|	Anotación funcional para todo el genoma de GenBank |
+| results/figures/library_metrics.png	|	Gráficas de Profundidad (millones de lecturas) y Mediana de conteos por gen |
 La ejecución completa tarda unos pocos minutos y requiere conexión a internet.
 
 *Tablas de resultados (Ubicados en _results/tables/_)*

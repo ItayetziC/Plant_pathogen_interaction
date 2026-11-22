@@ -82,6 +82,7 @@ Cada función está documentada con su propósito, sus parámetros de entrada y 
 el problema.
 
 | Módulo | Responsabilidad |
+|:--|:--|
 | geo_download.py |	Consulta GEO con Entrez y descarga los archivos de la serie |
 | data_prep.py	| Valida la matriz, selecciona las muestras del contraste, limpia y filtra |
 | annotation.py	| Descarga los registros GenBank y une la anotación a la matriz de conteos |
@@ -133,6 +134,7 @@ La ejecución completa tarda unos pocos minutos y requiere conexión a internet.
 
 *Figuras (Ubicados en _results/figures/_)*
 | Archivo	| Contenido |
+|:--|:--|
 | library_metrics.png	| Profundidad y cobertura por muestra |
 | pca_samples.png	| Análisis de componentes principales de las muestras |
 | volcano_plot.png	| Magnitud y significancia del cambio para todos los genes |

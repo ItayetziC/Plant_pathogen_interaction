@@ -76,3 +76,104 @@ def rank_unknown_function_genes(unknown_genes_df):
     )
 
     return ranked_genes_df
+
+
+def identify_t3ss_genes(degs_df):
+    """
+    Identifica candidatos relacionados con el sistema de
+    secreción tipo III mediante sus anotaciones funcionales.
+    """
+
+    # Patrones utilizados en la búsqueda original
+    t3ss_pattern = (
+        r"type III secretion|"
+        r"type III effector|"
+        r"\bHrp[A-Za-z0-9]*\b|"
+        r"\bHrc[A-Za-z0-9]*\b|"
+        r"\bHop[A-Za-z0-9]*\b|"
+        r"\bAvr[A-Za-z0-9]*\b"
+    )
+
+    t3ss_mask = degs_df["final_product"].str.contains(
+        t3ss_pattern,
+        case=False,
+        na=False,
+        regex=True
+    )
+
+    return degs_df.loc[t3ss_mask].copy()
+
+
+def classify_t3ss_genes(t3ss_genes_df):
+    """
+    Clasifica los candidatos T3SS según su anotación funcional.
+
+    Los genes sin categoría o con categorías ambiguas se
+    mantienen identificados para su revisión manual.
+    """
+
+    # Patrones de clasificación del análisis original
+    category_patterns = {
+        "Efectores": (
+            r"\beffector\b|"
+            r"\bHop[A-Za-z0-9-]*\b|"
+            r"\bAvr[A-Za-z0-9-]*\b|"
+            r"\bXop[A-Za-z0-9-]*\b"
+        ),
+        "Componentes estructurales y exportacion": (
+            r"type III secretion (?:system )?"
+            r"(?:protein|subunit|ATPase|helper|major pilin)|"
+            r"type III secretion system "
+            r"(?:inner|outer|export|stator|gatekeeper)|"
+            r"\bHrp pili protein\b|"
+            r"\bHrpF\b|"
+            r"\bHrpT\b"
+        ),
+        "Chaperonas": (
+            r"type III secretion system chaperone|"
+            r"CesT family"
+        ),
+        "Reguladores": (
+            r"\bHrpL\b|"
+            r"\bHrpR\b|"
+            r"\bHrpS\b|"
+            r"\bHrpV\b"
+        )
+    }
+
+    def assign_category(product):
+        # Identificar las categorías que coinciden
+        matches = [
+            category
+            for category, pattern in category_patterns.items()
+            if re.search(pattern, str(product), re.IGNORECASE)
+        ]
+
+        # Evitar asignaciones ambiguas automáticamente
+        if len(matches) == 1:
+            return matches[0]
+
+        return "Revisar manualmente"
+
+    classified_df = t3ss_genes_df.copy()
+
+    classified_df["t3ss_category"] = (
+        classified_df["final_product"].apply(assign_category)
+    )
+
+    return classified_df
+
+
+def summarize_t3ss_genes(classified_df):
+    """
+    Resume la cantidad de genes inducidos y reprimidos
+    por categoría funcional del T3SS.
+    """
+
+    summary_df = pd.crosstab(
+        classified_df["t3ss_category"],
+        classified_df["regulacion"]
+    )
+
+    return summary_df
+

@@ -323,24 +323,49 @@ def plot_candidatos(results: pd.DataFrame,
         ax.spines[lado].set_visible(False)
     return ax
 
+
 def plot_kegg_enrichment(results_df, title, ax=None):
     """
-    Genera un dot plot de rutas KEGG significativamente enriquecidas.
+    Genera un gráfico de puntos para visualizar las rutas
+    KEGG significativamente enriquecidas.
 
-    Parametros
+    Parameters
     ----------
     results_df : pandas.DataFrame
-        Resultados del analisis ORA.
+        Tabla de resultados del enriquecimiento KEGG.
     title : str
         Titulo de la grafica.
-    ax : matplotlib.axes.Axes, opcional
-        Eje sobre el que se dibujar la grafica.
+    ax : matplotlib.axes.Axes, optional
+        Eje donde se dibujará la gráfica.
 
-    Retorna
+    Returns
     -------
     matplotlib.axes.Axes
         Eje que contiene la grafica.
+
+    Raises
+    ------
+    TypeError
+        Si results_df no es un DataFrame o title no es str.
+    ValueError
+        Si faltan columnas necesarias para generar la grafica.
     """
+    
+    if not isinstance(results_df, pd.DataFrame):
+        raise TypeError("results_df debe ser DataFrame")
+
+    required = {"padj", "pathway_name", "overlap_count"}
+    missing = required - set(results_df.columns)
+
+    if missing:
+        raise ValueError(
+            f"Faltan columnas en results_df: {sorted(missing)}. "
+            "Solución: usa la salida de run_kegg_enrichment()."
+        )
+
+    if not isinstance(title, str):
+        raise TypeError("title debe ser str")
+
     # Seleccionar las rutas significativamente enriquecidas
     significant_df = results_df.loc[
         results_df["padj"] < 0.05
@@ -403,24 +428,57 @@ def plot_kegg_enrichment(results_df, title, ax=None):
 
 def plot_t3ss_categories(summary_df, ax=None):
     """
-    Genera una gráfica de barras horizontales apiladas
-    para representar la clasificación funcional del T3SS.
+    Visualiza la distribución de genes relacionados con el sistema
+    de secreción tipo III (T3SS) segun su categoria funcional
+    y regulacion diferencial.
 
-    Parámetros
+    Genera una grafica de barras horizontales apiladas que representa
+    el numero de genes inducidos y reprimidos en cada categoria:
+    efectores, componentes estructurales y de exportación,
+    chaperonas y reguladores.
+
+    Si alguna de las columnas de regulacion ('inducido' o
+    'reprimido') no está presente, se incorpora con valores
+    iguales a cero.
+
+    Parameters
     ----------
     summary_df : pandas.DataFrame
-        Tabla con el número de genes inducidos y reprimidos
-        por categoría funcional.
+        Tabla resumen con las categorias funcionales del T3SS
+        como índice y los conteos de genes inducidos y reprimidos
+        como columnas.
+    ax : matplotlib.axes.Axes, optional
+        Eje sobre el cual se dibujará la gráfica. Si no se
+        proporciona, se crea una nueva figura.
 
-    ax : matplotlib.axes.Axes, opcional
-        Eje donde se dibujará la gráfica.
-
-    Retorna
+    Returns
     -------
     matplotlib.axes.Axes
-        Eje con la gráfica generada.
+        Eje que contiene la grafica de barras apiladas.
+
+    Raises
+    ------
+    TypeError
+        Si summary_df no es un DataFrame o si las columnas
+        de regulación contienen valores no numéricos.
+    ValueError
+        Si las columnas de regulación contienen conteos negativos.
     """
 
+    if not isinstance(summary_df, pd.DataFrame):
+        raise TypeError("summary_df debe ser DataFrame")
+
+    for column in ("inducido", "reprimido"):
+        if column in summary_df.columns:
+            if not pd.api.types.is_numeric_dtype(summary_df[column]):
+                raise TypeError(
+                    f"La columna {column} debe contener valores numericos"
+                )
+
+            if (summary_df[column] < 0).any():
+                raise ValueError(
+                    f"La columna {column} contiene conteos negativos"
+                )
     # Crear una copia de la tabla
     plot_df = summary_df.copy()
 
@@ -448,7 +506,7 @@ def plot_t3ss_categories(summary_df, ax=None):
         plot_df.index,
         plot_df["inducido"],
         label="Inducidos",
-        color="#4C78A8"
+        color="#2C493B"
     )
 
     ax.barh(
@@ -456,7 +514,7 @@ def plot_t3ss_categories(summary_df, ax=None):
         plot_df["reprimido"],
         left=plot_df["inducido"],
         label="Reprimidos",
-        color="#E45756"
+        color="#591A24"
     )
 
     # Agregar el total de genes al final de cada barra
@@ -471,11 +529,11 @@ def plot_t3ss_categories(summary_df, ax=None):
         )
 
     # Configurar las etiquetas
-    ax.set_xlabel("Número de genes diferencialmente expresados")
-    ax.set_ylabel("Categoría funcional")
-    ax.set_title("Clasificación funcional de genes relacionados con T3SS")
+    ax.set_xlabel("Numero de genes diferencialmente expresados")
+    ax.set_ylabel("Categoria funcional")
+    ax.set_title("Clasificacion funcional de genes relacionados con T3SS")
 
-    ax.legend(title="Regulación")
+    ax.legend()
     ax.invert_yaxis()
     ax.set_xlim(0, plot_df.sum(axis=1).max() + 4)
 
@@ -484,9 +542,62 @@ def plot_t3ss_categories(summary_df, ax=None):
 
 def plot_genomic_context(context_df, target_locus="PSPTO1385", ax=None):
     """
-    Representa el contexto genómico de un candidato mediante
-    flechas que indican la posición, orientación y regulación.
+    Representa el contexto genomico de un gen de interes y sus
+    genes vecinos mediante un esquema de organizacion cromosomica.
+
+    Genera una representacion grafica de los genes presentes
+    en una region del cromosoma, para indicar su posicion,
+    longitud y orientación de transcripcion.
+
+    Parameters
+    ----------
+    context_df : pandas.DataFrame
+        Tabla con la informacion genomica y de expresion diferencial.
+        Debe contener las columnas 'locus_key', 'start', 'end',
+        'strand', 'regulacion' y 'log2FoldChange'.
+    target_locus : str, optional
+        Identificador del gen de interes que se desea resaltar.
+        Por defecto es 'PSPTO1385'.
+    ax : matplotlib.axes.Axes, optional
+        Eje sobre el cual se dibujara el contexto genomico.
+        Si no se proporciona, se crea una nueva figura.
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+        Eje que contiene la representacion del contexto genomico.
+
+    Raises
+    ------
+    TypeError
+        Si context_df no es un DataFrame.
+    ValueError
+        Si la tabla esta vacia, faltan columnas necesarias
+        o el gen de interés no está presente en context_df.
     """
+
+    if not isinstance(context_df, pd.DataFrame):
+        raise TypeError("context_df debe ser DataFrame")
+
+    required = {
+        "start", "end", "strand", "regulacion",
+        "locus_key", "log2FoldChange"
+    }
+    missing = required - set(context_df.columns)
+
+    if missing:
+        raise ValueError(
+            f"Faltan columnas en context_df: {sorted(missing)}. "
+            "Solución: usa la salida de prepare_genomic_context()."
+        )
+
+    if context_df.empty:
+        raise ValueError("No hay genes para representar.")
+
+    if target_locus not in context_df["locus_key"].values:
+        raise ValueError(
+            f"No se encontró el gen {target_locus} en context_df."
+        )
 
     if context_df.empty:
         raise ValueError("No hay genes para representar.")
@@ -497,8 +608,8 @@ def plot_genomic_context(context_df, target_locus="PSPTO1385", ax=None):
 
     # Definir los colores según la regulación
     regulation_colors = {
-        "inducido": "#D95F02",
-        "reprimido": "#1B9E77",
+        "inducido": "#2C493B",
+        "reprimido": "#591A24",
         "sin cambio": "#A0A0A0"
     }
 
@@ -594,25 +705,7 @@ def plot_genomic_context(context_df, target_locus="PSPTO1385", ax=None):
         pad=18
     )
 
-    # Crear la leyenda
-    legend_items = [
-        Patch(facecolor="#D95F02", label="Inducido"),
-        Patch(facecolor="#1B9E77", label="Reprimido"),
-        Patch(facecolor="#A0A0A0", label="Sin cambio o sin datos"),
-        Patch(
-            facecolor="white",
-            edgecolor="black",
-            linewidth=2,
-            label=target_locus
-        )
-    ]
-
-    ax.legend(
-        handles=legend_items,
-        loc="upper right",
-        frameon=False
-    )
-
     ax.ticklabel_format(style="plain", axis="x")
 
     return ax
+

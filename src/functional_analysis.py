@@ -5,25 +5,42 @@ Funciones para el análisis funcional de genes diferencialmente expresados.
 import pandas as pd
 import re
 from Bio import SeqIO
+from pathlib import Path
 
 
 def identify_unknown_function_genes(degs_df):
     """
-    Identifica genes diferencialmente expresados cuya función
-    es desconocida o está poco caracterizada.
-
-    Parámetros
+    Identifica genes diferencialmente expresados con funcion desconocida.
+    Busca en la anotación `final_product` descripciones de proteínas
+    hipoteticas, no caracterizadas o con dominios DUF. Conserva todas
+    las columnas originales y devuelve una tabla vacia si no hay coincidencias.
+    
+    Parameters
     ----------
     degs_df : pandas.DataFrame
-        Tabla de genes diferencialmente expresados.
-
-    Retorna
+        Tabla de genes diferencialmente expresados anotados; debe
+        contener la columna 'final_product'.
+    
+    Returns
     -------
     pandas.DataFrame
-        Genes con anotaciones de función desconocida o
-        poco caracterizada.
+        Subconjunto de genes con función desconocida o poco caracterizada.
+    
+    Raises
+    ------
+    TypeError
+        Si degs_df no es un DataFrame.
+    ValueError
+        Si falta la columna 'final_product'.
     """
-
+    if not isinstance(degs_df, pd.DataFrame):
+        raise TypeError("degs_df debe ser un DataFrame.")
+    if "final_product" not in degs_df.columns:
+        raise ValueError(
+            "Falta la columna 'final_product' en degs_df. "
+            "Solución: utiliza la tabla con anotación funcional."
+        )
+    
     # Definir los patrones de búsqueda en las anotaciones
     unknown_pattern = (
         r"hypothetical protein|"
@@ -47,20 +64,42 @@ def identify_unknown_function_genes(degs_df):
 
 def rank_unknown_function_genes(unknown_genes_df):
     """
-    Ordena los genes de función desconocida según la magnitud
-    de su cambio de expresión y su significancia estadística.
-
-    Parámetros
+    Ordena genes de función desconocida por cambio de expresión.
+    Calcula el valor absoluto de log2FoldChange en la columna
+    'abs_log2FC' y ordena de mayor a menor magnitud. En caso de empate,
+    prioriza los valores p ajustados más pequeños. No modifica la entrada.
+    
+    Parameters
     ----------
     unknown_genes_df : pandas.DataFrame
-        Genes de función desconocida o poco caracterizada.
-
-    Retorna
+        Genes con función desconocida; requiere 'log2FoldChange' y
+        'adj_pvalue' como columnas numéricas.
+    
+    Returns
     -------
     pandas.DataFrame
-        Genes ordenados por el valor absoluto de log2FoldChange.
+        Tabla ordenada, con la columna adicional 'abs_log2FC'.
+    
+    Raises
+    ------
+    TypeError
+        Si la entrada no es un DataFrame o las columnas de análisis
+        no son numéricas.
+    ValueError
+        Si faltan las columnas necesarias.
     """
-
+    if not isinstance(unknown_genes_df, pd.DataFrame):
+        raise TypeError("unknown_genes_df debe ser un DataFrame.")
+    required = {"log2FoldChange", "adj_pvalue"}
+    missing = required - set(unknown_genes_df.columns)
+    if missing:
+        raise ValueError(
+            f"Faltan columnas en unknown_genes_df: {sorted(missing)}."
+        )
+    for column in required:
+        if not pd.api.types.is_numeric_dtype(unknown_genes_df[column]):
+            raise TypeError(f"La columna '{column}' debe ser numérica.")
+        
     # Crear una copia para evitar modificar los datos originales
     ranked_genes_df = unknown_genes_df.copy()
 
@@ -80,9 +119,35 @@ def rank_unknown_function_genes(unknown_genes_df):
 
 def identify_t3ss_genes(degs_df):
     """
-    Identifica candidatos relacionados con el sistema de
-    secreción tipo III mediante sus anotaciones funcionales.
+    Identifica genes candidatos asociados al sistema de secrecion tipo III.
+    Busca en 'final_product' términos relacionados con secrecion tipo III,
+    Devuelve una tabla vacía si no encuentra coincidencias.
+     
+    Parameters
+    ----------
+    degs_df : pandas.DataFrame
+        Tabla de genes anotados con la columna 'final_product'.
+    
+    Returns
+    -------
+    pandas.DataFrame
+        Subconjunto de genes candidatos asociados al T3SS.
+    
+    Raises
+    ------
+    TypeError
+        Si degs_df no es un DataFrame.
+    ValueError
+        Si falta la columna 'final_product'.
     """
+
+    if not isinstance(degs_df, pd.DataFrame):
+        raise TypeError("degs_df debe ser un DataFrame.")
+    if "final_product" not in degs_df.columns:
+        raise ValueError(
+            "Falta la columna 'final_product' en degs_df. "
+            "Solución: utiliza la tabla con anotación funcional."
+        )
 
     # Patrones utilizados en la búsqueda original
     t3ss_pattern = (
@@ -106,13 +171,38 @@ def identify_t3ss_genes(degs_df):
 
 def classify_t3ss_genes(t3ss_genes_df):
     """
-    Clasifica los candidatos T3SS según su anotación funcional.
-
-    Los genes sin categoría o con categorías ambiguas se
-    mantienen identificados para su revisión manual.
+    Clasifica candidatos T3SS segun su anotacion funcional.
+    Asigna las categorias 'Efectores', 'Componentes estructurales y
+    exportacion', 'Chaperonas' o 'Reguladores' según patrones de texto.
+    Las anotaciones sin coincidencia única quedan como 'Revisar manualmente'.
+    Conserva la tabla original y agrega la columna 't3ss_category'.
+    
+    Parameters
+    ----------
+    t3ss_genes_df : pandas.DataFrame
+        Genes candidatos T3SS con la columna 'final_product'.
+    
+    Returns
+    -------
+    pandas.DataFrame
+        Tabla con la categoría funcional asignada a cada gen.
+    
+    Raises
+    ------
+    TypeError
+        Si t3ss_genes_df no es un DataFrame.
+    ValueError
+        Si falta la columna 'final_product'.
     """
 
-    # Patrones de clasificación del análisis original
+    if not isinstance(t3ss_genes_df, pd.DataFrame):
+        raise TypeError("t3ss_genes_df debe ser un DataFrame.")
+    if "final_product" not in t3ss_genes_df.columns:
+        raise ValueError(
+            "Falta la columna 'final_product' en t3ss_genes_df."
+        )
+
+    # Patrones de clasificación del analisis original
     category_patterns = {
         "Efectores": (
             r"\beffector\b|"
@@ -148,34 +238,59 @@ def classify_t3ss_genes(t3ss_genes_df):
             for category, pattern in category_patterns.items()
             if re.search(pattern, str(product), re.IGNORECASE)
         ]
-
         # Evitar asignaciones ambiguas automáticamente
         if len(matches) == 1:
             return matches[0]
-
         return "Revisar manualmente"
 
     classified_df = t3ss_genes_df.copy()
-
     classified_df["t3ss_category"] = (
         classified_df["final_product"].apply(assign_category)
     )
-
     return classified_df
 
 
 def summarize_t3ss_genes(classified_df):
     """
-    Resume la cantidad de genes inducidos y reprimidos
-    por categoría funcional del T3SS.
+    Resume los genes T3SS por categoría funcional y regulación.
+    Construye una tabla de contingencia que cuenta las observaciones
+    de cada combinación entre 't3ss_category' y 'regulacion'.
+    Las categorías ausentes no se incorporan automáticamente.
+    
+    Parameters
+    ----------
+    classified_df : pandas.DataFrame
+        Tabla clasificada que contiene 't3ss_category' y 'regulacion'.
+    
+    Returns
+    -------
+    pandas.DataFrame
+        Conteos de genes por categoría funcional (filas) y
+        tipo de regulación (columnas).
+    
+    Raises
+    ------
+    TypeError
+        Si classified_df no es un DataFrame.
+    ValueError
+        Si faltan columnas necesarias para el resumen.
     """
-
+    if not isinstance(classified_df, pd.DataFrame):
+        raise TypeError("classified_df debe ser un DataFrame.")
+    required = {"t3ss_category", "regulacion"}
+    missing = required - set(classified_df.columns)
+    if missing:
+        raise ValueError(
+            f"Faltan columnas en classified_df: {sorted(missing)}."
+        )
+    
     summary_df = pd.crosstab(
         classified_df["t3ss_category"],
         classified_df["regulacion"]
     )
 
     return summary_df
+
 
 def extract_genomic_region(
     genbank_file,
@@ -189,6 +304,58 @@ def extract_genomic_region(
     Se consideran tanto locus_tag como old_locus_tag
     para recuperar los identificadores históricos.
     """
+    """
+    Extrae las CDS de una región identificada por loci PSPTO.
+    Lee un registro GenBank y busca identificadores 'PSPTO' tanto en
+    'locus_tag' como en 'old_locus_tag'. Conserva las coordenadas,
+    orientación, identificador actual y anotación de producto de las
+    CDS comprendidas en el rango inclusivo solicitado.
+    
+    Parameters
+    ----------
+    genbank_file : str or pathlib.Path
+        Ruta de un archivo GenBank con un registro cromosómico.
+    start_locus : int, optional
+        Número inicial del rango PSPTO, inclusive; por defecto 1369.
+    end_locus : int, optional
+        Número final del rango PSPTO, inclusive; por defecto 1406.
+    
+    Returns
+    -------
+    pandas.DataFrame
+        Tabla ordenada por coordenada inicial con las columnas
+        'locus_key', 'current_locus', 'start', 'end', 'strand'
+        y 'genbank_product'.
+    
+    Raises
+    ------
+    TypeError
+        Si la ruta no es de tipo texto o Path, o si los límites no
+        son enteros.
+    FileNotFoundError
+        Si el archivo GenBank no existe.
+    ValueError
+        Si la ruta está vacía, el rango es inválido o no se
+        encuentran genes en la región solicitada.
+    """
+
+    if not isinstance(genbank_file, (str, Path)):
+        raise TypeError("genbank_file debe ser una ruta str o Path.")
+    if not str(genbank_file).strip():
+        raise ValueError("genbank_file no puede ser una ruta vacía.")
+    if not isinstance(start_locus, int) or isinstance(start_locus, bool):
+        raise TypeError("start_locus debe ser un entero.")
+    if not isinstance(end_locus, int) or isinstance(end_locus, bool):
+        raise TypeError("end_locus debe ser un entero.")
+    if start_locus < 0 or end_locus < start_locus:
+        raise ValueError(
+            "El rango de locus debe ser no negativo y start_locus "
+            "no puede superar end_locus."
+        )
+    if not Path(genbank_file).is_file():
+        raise FileNotFoundError(
+            f"No se encontró el archivo GenBank: {genbank_file}"
+        )
 
     # Leer el archivo GenBank del cromosoma
     record = SeqIO.read(genbank_file, "genbank")
@@ -269,11 +436,68 @@ def prepare_genomic_context(
     flank_genes=3
 ):
     """
-    Integra las coordenadas genómicas de un gen y sus vecinos
-    con los resultados de expresión diferencial.
-
-    Selecciona los genes vecinos según su posición cromosómica.
+    Integra coordenadas genómicas con resultados de expresión diferencial.
+    
+    Parameters
+    ----------
+    genomic_context_df : pandas.DataFrame
+        Tabla genómica con las columnas 'locus_key' y 'start', como
+        la generada por extract_genomic_region().
+    expression_df : pandas.DataFrame
+        Resultados de expresión con 'locus_key', 'log2FoldChange',
+        'adj_pvalue' y 'regulacion'.
+    target_locus : str, optional
+        Identificador PSPTO del gen de interés; por defecto 'PSPTO1385'.
+    flank_genes : int, optional
+        Número de genes vecinos a cada lado; por defecto 3.
+    
+    Returns
+    -------
+    pandas.DataFrame
+        Región seleccionada, ordenada por posición cromosómica y
+        enriquecida con información de expresión e 'is_target'.
+    
+    Raises
+    ------
+    TypeError
+        Si las tablas, el identificador o flank_genes tienen tipos
+        incorrectos.
+    ValueError
+        Si faltan columnas, flank_genes es negativo, el identificador
+        es vacío, no se encuentra el gen objetivo o existen claves
+        duplicadas incompatibles con el cruce uno a uno.
     """
+    
+    if not isinstance(genomic_context_df, pd.DataFrame):
+        raise TypeError("genomic_context_df debe ser un DataFrame.")
+    if not isinstance(expression_df, pd.DataFrame):
+        raise TypeError("expression_df debe ser un DataFrame.")
+    genomic_required = {"locus_key", "start"}
+    expression_required = {
+        "locus_key", "log2FoldChange", "adj_pvalue", "regulacion"
+    }
+    missing_genomic = genomic_required - set(genomic_context_df.columns)
+    missing_expression = expression_required - set(expression_df.columns)
+    if missing_genomic:
+        raise ValueError(
+            f"Faltan columnas en genomic_context_df: {sorted(missing_genomic)}."
+        )
+    if missing_expression:
+        raise ValueError(
+            f"Faltan columnas en expression_df: {sorted(missing_expression)}."
+        )
+    if not isinstance(target_locus, str):
+        raise TypeError("target_locus debe ser una cadena de texto.")
+    if not target_locus.strip():
+        raise ValueError("target_locus no puede estar vacío.")
+    if not isinstance(flank_genes, int) or isinstance(flank_genes, bool):
+        raise TypeError("flank_genes debe ser un entero.")
+    if flank_genes < 0:
+        raise ValueError("flank_genes no puede ser negativo.")
+    if genomic_context_df["locus_key"].duplicated().any():
+        raise ValueError("genomic_context_df contiene locus_key duplicados.")
+    if expression_df["locus_key"].duplicated().any():
+        raise ValueError("expression_df contiene locus_key duplicados.")
 
     # Ordenar los genes por sus coordenadas
     context_df = genomic_context_df.sort_values(

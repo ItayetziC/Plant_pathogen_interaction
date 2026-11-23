@@ -12,7 +12,7 @@ Escherichia coli. -->
 | Integrante 2 | Leilani Cruz Ramírez leilanic@lcg.unam.mx |
 | Integrante 3 | Andrómeda Coral Gutiérrez andcoral@lcg.unam.mx |
 | Fecha de creación | 25/08/2026 |
-| Última actualización | 19/10/2026 |
+| Última actualización | 22/11/2026 |
 | Repositorio | https://github.com/ItayetziC/Plant_pathogen_interaction |
 
 <!-- AYUDA: Mantengan actualizados el estado, la fecha y la versión. La versión
@@ -382,14 +382,13 @@ EJEMPLO: Ana desarrolla la descarga y revisa el módulo de visualización. -->
 
 ### 10.2 Riesgos y alternativas
 
-<!-- AYUDA: Identifiquen situaciones que podrían impedir o retrasar el proyecto
-y definan una alternativa.
-EJEMPLO: Los datos requieren demasiado almacenamiento; alternativa: reducir el
-número de genomas usando criterios documentados. -->
-
-| Riesgo | Probabilidad | Impacto | Prevención o alternativa |
-|:--|:--|:--|:--|
-| [Riesgo] | Baja/Media/Alta | Bajo/Medio/Alto | [Acción] |
+| Riesgo | Probabilidad |	Impacto	|	Prevención o alternativa
+|	--	|	--	|	--	|	--	|	
+|	Pocas réplicas en condición de control, que puede reducir el poder estadístico	|	Media	|	Alto	|	Consultar a alguien con experiencia en análisis de Expresión Diferencial. Usar la correción por múltiples pruebas. Complementar con datos _in vitro_ de otro estudio, o incorporar cepas mutantes en KB.
+|	Desbalance entre condiciones y variación en la profundidad de secuenciación entre muestras _in planta_	|	Media	|	Medio	|	Normalizar con InMoose antes del análisis diferencial. Revisar la profundidad y la mediana de conteos en el control de calidad y descartar réplicas atípicas con el PCA.	
+|	Dependencia total de la calidad y el diseño de datos públicos (Nobori _et al._, 2018), sin posibilidad de repetir o ampliar el experimento	|	Medio	|	Alto	|	Aclarar la fuente de los datos. Verificar el control de calidad del dataset. Apegarse a las condiciones del estudio
+|	Anotación funcional incompleta: genes hipotéticos o sin función asignada, y desajustes al unir la matriz de conteos con GenBank	|	Alta	|	Medio	|	Unir por el identificador _locus tag_ antiguo, documentar los genes sin correspondencia y conservar la fuente de cada anotación. Presentar los genes hipotéticos como candidatos, sin asegurar su función.
+|	Dificultades técnicas con la reproducibilidad (versiones de Python, librerías, o cambios en el formato de los archivos descargados)	|	Media	|	Medio	|		Fijar versiones en `project_report.md`, documentar la descarga en el notebook `01_descarga` y validar entradas con las excepciones ya implementadas.
 
 ## 11. Resultados
 

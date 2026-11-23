@@ -8,7 +8,11 @@
 - Control de calidad de datos por medio de un PCA de las muestras obtenidas.
 - Análisis de expresión diferencial con InMoose: normalización por mediana de razones, estimación de dispersión con encogimiento bayesiano, modelo binomial negativo y prueba de Wald con corrección de Benjamini-Hochberg.
 - Validación del análisis contra genes control de comportamiento conocido.
-- Visualización de resultados: volcano plot, mapa de calor de los genes más expresados y figura de candidatos sin función asignada.
+- Consulta e integración de información de KEGG: recuperación de rutas metabólicas y asociaciones gen-ruta correspondientes a _P. syringae pv. tomato DC3000_.
+- Análisis de enriquecimiento funcional: identificación de rutas KEGG sobrerrepresentadas entre los genes diferencialmente expresados mediante un análisis de sobrerrepresentación (ORA).
+- Clasificación funcional de genes: identificación de genes asociados con el sistema de secreción tipo III (T3SS) y de genes diferencialmente expresados anotados como proteínas hipotéticas o de función desconocida.
+- Visualización de resultados: generación de volcano plot, mapas de calor, gráficos de candidatos sin función asignada y dotplot de enriquecimiento de rutas KEGG.
+
 
 
 
@@ -89,7 +93,7 @@ el problema.
 | annotation.py	| Descarga los registros GenBank y une la anotación a la matriz de conteos |
 | quality_control.py	| Métricas de profundidad por muestra y análisis de componentes principales |
 | differential_expression.py	| Construcción del modelo, normalización, dispersión, prueba de Wald y clasificación |
-| kegg_analysis.py	Consulta de rutas KEGG y análisis de sobrerrepresentación |
+| kegg_analysis.py	| Consulta de rutas KEGG y análisis de sobrerrepresentación |
 | functional_analysis.py	| Clasificación funcional de los genes diferencialmente expresados |
 | visualization.py	| Todas las figuras del proyecto |
 
@@ -118,10 +122,11 @@ Al terminar el notebook se habrán generado los siguientes archivos:
 | processed/GEO_samples.csv	| Las 114 muestras de la serie con su código GSM |
 | processed/counts_filtered.csv	| Matriz de conteos crudos filtrada, restringida a las muestras del contraste |
 | processed/sample_metadata.csv |	Condición experimental y código GSM de cada muestra seleccionada |
-| processed/genbank_annotation_DC3000.csv	| Anotación extraída de los registros GenBank |
+| processed/genbank_annotation_DC3000.csv	| Anotación funcional extraída de los registros GenBank |
 | processed/final_annotation.csv	| Anotación funcional por gen, combinando GenBank y la matriz |
-| data/processed/genbank_annotation_DC3000	.csv	|	Anotación funcional para todo el genoma de GenBank |
-| results/figures/library_metrics.png	|	Gráficas de Profundidad (millones de lecturas) y Mediana de conteos por gen |
+| processed/kegg_pathways.tsv|Identificadores de las rutas metabólicas y funcionales de KEGG, junto con sus respectivos nombres, correspondientes a Pseudomonas syringae pv. tomato |
+| processed/kegg_gene_pathway.tsv	|	Ientificadores de genes y rutas biológicas de KEGG. Permite relacionar los genes con sus respectivas rutas |
+
 La ejecución completa tarda unos pocos minutos y requiere conexión a internet.
 
 *Tablas de resultados (Ubicados en _results/tables/_)*
@@ -134,6 +139,12 @@ La ejecución completa tarda unos pocos minutos y requiere conexión a internet.
 | kegg_pathways.tsv y kegg_gene_pathway.tsv	| Catálogo de rutas KEGG y su asociación con cada gen |
 | ora_significant_pathways.csv	| Rutas enriquecidas entre los genes diferencialmente expresados |
 | degs_funcion_desconocida.csv	| Genes diferenciales anotados como proteína hipotética |
+| ora_all.csv| Resultados del análisis de sobrerrepresentación (ORA) de rutas KEGG considerando todos los genes diferencialmente expresados. |
+| ora_downregulated.csv | Resultados del análisis ORA de rutas KEGG considerando únicamente los genes reprimidos durante la infección |
+|ora_upregulated.csv| Resultados del análisis ORA de rutas KEGG considerando únicamente los genes inducidos durante la infección|
+| genomic_context_PSPTO1385.csv|Información genómica de PSPTO1385 con los resultados de expresión diferencial |
+|genomic_context_candidates.csv| Genes vecinos de los candidatos PSPTO1372 y PSPTO1385 y sus anotaciones funcionales|
+| degs_t3ss_clasificados.csv| Conjunto de genes candidatos relacionados con el T3SS|
 
 *Figuras (Ubicados en _results/figures/_)*
 | Archivo	| Contenido |
@@ -144,14 +155,28 @@ La ejecución completa tarda unos pocos minutos y requiere conexión a internet.
 | heatmap_top40.png	| Los 20 genes más inducidos y los 20 más reprimidos, por muestra |
 | candidatos_hipoteticos.png	| Genes sin función asignada con cambio de expresión relevante |
 | kegg_enrichment_dotplot.png	| Rutas KEGG enriquecidas |
+|genomic_context_PSPTO1385.png| Contexto genómico, posición en el cromosoma  y expresión diferencial de gen candidato|
+|t3ss_functional_categories.png| Clasificación funcional de los genes relacionados con el T3SS|
 
 ## Resultados más relevantes 
 a) A partir del Análisis de Expresión Diferencial con _Inmoose_:
 1. De 5394 genes evaluados, 1458 resultaron diferencialmente expresados (FDR < 0.05 y |log2FoldChange| > 1): 830 inducidos y 628 reprimidos durante la infección.
 2. Los cuatro controles positivos de virulencia se indujeron como predice la literatura: pvdS (+6.86), avrPto1 (+6.05), cmaA (+5.68) y hrpL (+4.90).
-3. Entre los genes anotados como proteína hipotética, 122 presentan expresión diferencial. 
+3. Entre los genes anotados como proteína hipotética, 122 presentan expresión diferencial.
 
-b) A partir del análisis de _ORA_:
+b) Análisis de enriquecimiento de rutas metabólicas _(KEGG)_:
+1. Se identificaron 356 genes inducidos con asociaciones a rutas KEGG
+2. El análisis de sobrerrepresentación (ORA) identificó cinco rutas significativamente enriquecidas, considerando un valor de p ajustado (FDR) inferior a 0.05.
+3. Entre las rutas enriquecidas se encontraron
+    - Ribosoma (pst03010).
+    - Biosíntesis de metabolitos secundarios (pst01110).
+    - Glucólisis/gluconeogénesis (pst00010).
+    - Metabolismo del carbono (pst01200).
+    - Ciclo del ácido cítrico (pst00020).
+
+c) Análisis funcional de genes diferencialmente expresados
+1. Se identificaron 122 genes diferencialmente expresados anotados como proteínas hipotéticas, que representan candidatos de interés para investigaciones posteriores.
+2. Se implementó una clasificación de genes asociados con el sistema de secreción tipo III (T3SS), un componente importante de la interacción entre P. syringae y su hospedero
 
 La interpretación completa está en el reporte del proyecto, además se puede visualizar los resultados más relevantes en una presentación de [Canva](https://canva.link/6baxis1zo5ls3rw).
 

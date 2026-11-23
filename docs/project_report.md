@@ -12,7 +12,7 @@ Escherichia coli. -->
 | Integrante 2 | Leilani Cruz Ramírez leilanic@lcg.unam.mx |
 | Integrante 3 | Andrómeda Coral Gutiérrez andcoral@lcg.unam.mx |
 | Fecha de creación | 25/08/2026 |
-| Última actualización | 22/11/2026 |
+| Última actualización | 23/11/2026 |
 | Repositorio | https://github.com/ItayetziC/Plant_pathogen_interaction |
 
 <!-- AYUDA: Mantengan actualizados el estado, la fecha y la versión. La versión
@@ -361,8 +361,15 @@ visualización. -->
 
 ### 9.3 Estrategia de validación
 
-Validación de datos: las 48 excepciones que verifican entradas, identificadores inexistentes y archivos incompletos que se encuentran presentes en los scripts.
-Validación de muestras: el PCA confirmó la separación esperada y descartó réplicas atípicas; los análisis preliminares determinaron que se puede comparar por profundidad de las lecturas entre muestras a pesar de la dispersión in planta.
+Para garantizar la confiabilidad de los resultados y la reproducibilidad del análisis, se implementó una estrategia de validación que contempla la integridad de los datos de entrada, el control de calidad de las muestras, la consistencia de los análisis estadísticos y la verificación de las anotaciones funcionales.
+
+***Validación de datos y funcionamiento del software:*** Se incorporaron 48 excepciones y comprobaciones en los scripts del proyecto para detectar entradas inválidas, archivos incompletos, identificadores inexistentes e inconsistencias en las estructuras de datos. Estas validaciones permiten identificar errores durante la ejecución y evitar que se propaguen hacia las etapas posteriores del análisis.
+
+***Validación de muestras y control de calidad:*** Se evaluó la profundidad de secuenciación y la distribución de los conteos por muestra para identificar diferencias técnicas que pudieran afectar las comparaciones entre condiciones experimentales. Adicionalmente, se realizó un análisis de componentes principales (PCA), mediante el cual se observó una separación entre las muestras in planta e in vitro. El primer componente principal explicó el 43.8 % de la variabilidad, lo que proporciona evidencia exploratoria de diferencias entre ambos grupos.
+El PCA confirmó la separación esperada y descartó réplicas atípicas; los análisis preliminares determinaron que se puede comparar por profundidad de las lecturas entre muestras a pesar de la dispersión in planta.
+
+***Validación estadística del análisis de expresión diferencial:*** Se verificó la correspondencia entre los identificadores génicos y las anotaciones funcionales utilizadas para interpretar los resultados de expresión diferencial.La integración con KEGG se realizó mediante tablas que relacionan los identificadores de las rutas biológicas con sus nombres y los genes asociados a cada una.
+El análisis de enriquecimiento funcional permite identificar rutas sobrerrepresentadas entre los genes diferencialmente expresados. Su significancia se evalúa mediante valores de probabilidad ajustados por comparaciones múltiples, considerando el conjunto de genes de referencia utilizado.
 
 ## 10. Plan de trabajo
 
@@ -409,8 +416,35 @@ compárenlos con los antecedentes y señalen limitaciones. No repitan únicament
 los valores.
 EJEMPLO: La distribución observada sugiere..., aunque la interpretación está
 limitada por la calidad de las anotaciones. -->
+Los resultados del análisis transcriptómico diferencial de _Pseudomonas syringae pv. tomato DC3000_ permitieron explorar los cambios en la expresión génica asociados con la infección de _Arabidopsis thaliana_, así como identificar procesos biológicos y genes candidatos que podrían participar en la adaptación bacteriana al ambiente del hospedero.
 
-> Estado: pendiente. Se completará después de obtener resultados.
+***Cambios en la expresión génica durante la infección***.
+
+En relación con nuestra primera pregunta de investigación, el análisis de expresión diferencial mediante InMoose permitió identificar genes cuya expresión varía significativamente entre las condiciones in planta e in vitro. La existencia de genes inducidos y reprimidos sugiere que la bacteria modifica su programa transcripcional en respuesta a las condiciones del ambiente vegetal.
+
+Esta observación es consistente con lo descrito por Nobori et al. (2018), quienes demostraron que el transcriptoma de _P. syringae DC3000_ experimenta cambios durante su interacción con _A. thaliana_, evidenciando la importancia del ambiente del hospedero en la regulación de la expresión bacteriana [5]. Sin embargo, la separación observada entre condiciones mediante el análisis de componentes principales (PCA) no permite atribuir todas las diferencias exclusivamente al proceso de infección, ya que también pueden intervenir factores relacionados con las condiciones de cultivo, la variabilidad biológica y las características técnicas de las muestras.
+
+***Funciones biológicas asociadas con la adaptación al hospedero***
+
+Respecto a la segunda pregunta de investigación, el análisis de enriquecimiento funcional mediante KEGG permitió identificar procesos biológicos sobrerrepresentados entre los genes inducidos durante la infección, principalmente relacionados con la síntesis proteica, el metabolismo del carbono y la biosíntesis de metabolitos secundarios.
+El enriquecimiento de la ruta del ribosoma podría reflejar cambios en la demanda de síntesis proteica durante la interacción bacteria-hospedero. Por otra parte, la representación significativa de rutas como glucólisis/gluconeogénesis, metabolismo del carbono y ciclo del ácido cítrico sugiere modificaciones en la expresión de genes asociados con la utilización de nutrientes y el metabolismo energético.
+
+Estas observaciones son compatibles con los antecedentes descritos por Xin et al. (2018), quienes destacan que la capacidad de _P. syringae_ para colonizar el tejido vegetal depende, entre otros factores, de su adaptación a las condiciones fisiológicas y nutricionales del apoplasto [3]. Asimismo, el enriquecimiento de la biosíntesis de metabolitos secundarios podría relacionarse con cambios en procesos metabólicos relevantes para la fisiología bacteriana. No obstante, se requiere examinar los genes específicos asociados con esta ruta antes de proponer una relación directa con mecanismos de virulencia.
+
+Es importante considerar que el enriquecimiento estadístico de una ruta no demuestra necesariamente su activación funcional, ya que el análisis se basa en la representación de genes diferencialmente expresados y no en mediciones directas de actividad enzimática, abundancia proteica o flujo metabólico.
+
+***Genes con función desconocida y su posible relación con la patogenicidad***
+
+La tercera pregunta de investigación se abordó mediante la identificación de genes diferencialmente expresados cuya función se encuentra anotada como hipotética o poco caracterizada. Entre los candidatos identificados destacan genes como PSPTO2142, PSPTO1210, PSPTO1385 y PSPTO1372, que presentaron una mayor expresión durante la infección. Estos resultados permiten proponerlos como candidatos para estudios posteriores, aunque su patrón de expresión no constituye evidencia suficiente para atribuirles una función específica en la patogenicidad.
+
+Adicionalmente, el análisis del contexto genómico permitió examinar regiones que contienen genes relacionados con el sistema de secreción tipo III (T3SS), incluyendo efectores, proteínas estructurales y reguladores transcripcionales. Este sistema constituye uno de los principales mecanismos de virulencia de _P. syringae_, debido a su participación en la transferencia de proteínas efectoras hacia las células vegetales, como describen Buell et al. (2003) y Xin et al. (2018) [3,4].
+
+La proximidad genómica de genes hipotéticos a regiones asociadas con la virulencia puede proporcionar información complementaria para priorizar candidatos. Sin embargo, esta asociación debe interpretarse con precaución, puesto que la cercanía entre genes no demuestra que compartan regulación, función o participación directa en el proceso de infección.
+
+***Limitaciones e implicaciones del análisis***
+
+Los resultados dependen de la calidad de los datos públicos y de las anotaciones funcionales disponibles. Aunque la integración con GenBank y KEGG permitió ampliar la interpretación biológica, algunos genes carecen de funciones caracterizadas o de correspondencia con rutas conocidas, lo que limita su clasificación funcional. En conjunto, los resultados responden a las preguntas de investigación desde una perspectiva bioinformática: permiten identificar genes diferencialmente expresados, reconocer procesos biológicos enriquecidos y seleccionar genes poco caracterizados para investigaciones posteriores.
+
 
 ## 13. Conclusiones
 

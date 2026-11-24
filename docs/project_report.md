@@ -19,14 +19,10 @@ Escherichia coli. -->
 debe coincidir con una etiqueta de Git cuando exista una entrega identificable. -->
 
 ## Resumen del proyecto
-
-<!-- AYUDA: Expliquen en un párrafo el problema, su relevancia, los datos, la
-solución propuesta y el resultado principal. Conviene actualizarlo al final.
-EJEMPLO: Se analizarán genomas de E. coli disponibles en NCBI para identificar
-y comparar genes de resistencia. Se desarrollará un flujo reproducible en Python
-que obtenga los datos y genere tablas y visualizaciones comparativas. -->
-
-[Redacten aquí el resumen.]
+Análisis transcriptómico diferencial en Python de _Pseudomonas syringae_ pv. tomato DC3000 durante la infeccion de _Arabidopsis thaliana_. 
+Integra datos públicos de RNA-seq (GEO GSE103441), análisis estadístico de expresión diferencial mediante InMoose, anotación funcional (RefSeq GCF_000007805.1) 
+y enriquecimiento de rutas biológicas con KEGG, así como herramientas de visualización para explorar los mecanismos moleculares asociados con la interacción 
+planta-patógeno.
 
 ## 1. Contexto y antecedentes
 
@@ -215,7 +211,13 @@ base de datos, visualizaciones u otro producto.
 EJEMPLO: Repositorio ejecutable con scripts, datos de prueba, documentación,
 tabla comparativa y figuras regenerables. -->
 
-[Describan aquí el producto.]
+1. Se espera un repositorio ejecutable por medio de scripts y notebooks que sea reproducible y tenga una documencación descriptiva.
+   Además las figuras y resultados serán regenerables. Así como el uso de comprobaciones y aviso de errores explícito. 
+2. Se descargarán los datos esperados, se realizará el análisis de expresión diferencial por medio de inmoose y para su visualización
+   de usarán Volcano plot y Heatmaps
+3. Para el enriquecimiento funcional con los genes con patrón de expresión diferencial se visualizará por medio de scatter plots.
+4. Como parte de la obtención de genes sin anotación a candidatos virulentos se analizará su patrón de expresión y ubicación genómica,
+   además de gráficos visuales que lo comprueben. 
 
 
 ## 8. Datos
@@ -340,6 +342,9 @@ El análisis se organiza en seis etapas. Las primeras tres preparan y validan lo
 	El análisis de enriquecimiento identifica qué funciones biológicas aparecen sobrerrepresentadas entre los genes diferencialmente expresados, y responde la **Pregunta 2** (funcional). 
 	El filtrado de los genes anotados como proteína hipotética que resultan inducidos durante la infección responde la **Pregunta 3** (exploratoria), al priorizar candidatos para caracterización funcional posterior.
 
+**Figura de la estrategia metodológica** Se divide en 3 fases la obtención de datos (Etapa 1-3), Análisis de expresión diferencial (Etapa 4) e 
+Interpretación (Etapa 5 y 6) 
+<img width="1110" height="628" alt="imagen" src="https://github.com/user-attachments/assets/3137d5cb-53ab-4494-a640-af15b075c6a5" />
 
 ### 9.2 Herramientas y tecnologías
 
@@ -352,11 +357,14 @@ visualización. -->
 |:--|:--|:--|
 | Python | 3.14.7 | Para la ejecución de código |
 | Jupyter Notebook | 7.6.3 | Dividir el código en partes |
-| Biopython | 1.86 | Acceder a Entrez | 
-| Pandas | 3.0.6 | Manipulación y análisis de datos tabulares |
-| Matplotlib.pyplot | 3.11.2 | Crear y modificar gráficos
-| Numpy | 2.5.2 | Manejo de datos y cálculos numéricos
-
+| Biopython | 1.88 | Acceder a Entrez | 
+| Pandas | 2.3.3 | Manipulación y análisis de datos tabulares |
+| Matplotlib.pyplot | 3.10.6 | Crear y modificar gráficos |
+| Numpy | 2.5.2 | Manejo de datos y cálculos numéricos |
+| Scipy | 1.16.3 | Cálculos matemáticos avanzados sobre arreglos de NumPy |
+| Inmoose | 0.9.1 | Análisis de expresión diferencial |
+| statsmodels | 0.14.5 | Uso obligatorio por Inmoose |
+| seaborn | 0.13.2 | Gráficos visuales y estadísticos |
 
 
 ### 9.3 Estrategia de validación
@@ -405,8 +413,35 @@ obtenido; interprétenlo en Discusión.
 EJEMPLO: Tabla de presencia y ausencia generada por src/compare_genes.py.
 PRIMERA SESIÓN: dejen esta sección como pendiente. -->
 
-> Estado: pendiente. Se completará durante el desarrollo.
 
+1. Tabla de expresión diferencial de los genes anotada, a partir del análisis de expresión diferencial realizado con Inmoose se encontraron 1458 genes,
+   830 inducidos y 628 reprimidos se encontraron 1458 genes, 830 inducidos y 628 reprimidos, además se realizaron gráficos que ayudan a la interpretación
+   de resultados por medio de un Volcano plot y Heatmap, se muestran los resultados:
+   
+	<img width="714" height="564" alt="imagen" src="https://github.com/user-attachments/assets/29a603cf-7f18-49e5-bb50-8e996eea29b0" />
+	Figura 1. Volcano plot de los genes inducidos y reprimidos a partir del análisis de expresión diferencial
+	<img width="1129" height="441" alt="imagen" src="https://github.com/user-attachments/assets/142c00d0-6d39-4e1a-90be-d90469c92eb6" />
+	Figura 2. Heatmaps, de lado izquierdo se muestran los 20 genes más inducidos, de lado derecho los 20 genes más reprimidos 
+ 
+2. A partir de la tabla de expresión diferencial de los genes, se analizaron sus funciones y rutas biológicas a las que se
+   les pueda asociar los genes con un patrón de expresión diferente al control por medio de un enriquecimiento que se muestran
+   procesos biológicos claros, a partir de los genes expresados diferencialmente solo 525 tenían anotación en la base de datos.
+   Además, se encontraron 54 genes forman parte del Sistema de Secreción Tipo 3 (SST3), asociado a la patogenicidad, para su visualización
+   se realizarán scatter plots, a continuación se muestran los resultados:
+   
+   <img width="1396" height="615" alt="imagen" src="https://github.com/user-attachments/assets/82d2f5b7-e1f6-4c56-b3ef-c78392e2704c" />
+	Figura 3. Scatter plot de enriquecimiento con KEGG de genes inducidos
+	<img width="1132" height="514" alt="imagen" src="https://github.com/user-attachments/assets/47d15963-db72-41b5-a466-70ddd0c736ca" />
+   	Figura 4. Scatter plot de enriquecimiento con KEGG de genes reprimidos
+
+3. Para poder determinar genes sin anotación cuya expresión sea desconocida como candidatos a ser virulentos se analizó su expresión
+   de genes claramente inducidos en la infección. El gen con el identificador PSPTO1385 presentó una mayor expresión, por lo que
+   se buscó la ubicación genómica, cercana a los genes pertenecientes al Sistema de Secreción Tipo 3 (SST3), un indicio importante de
+   su función o su asociación a virulencia.
+
+   <img width="1093" height="376" alt="imagen" src="https://github.com/user-attachments/assets/78c3d18c-d5bb-4698-90ee-dedead717cd5" />
+   Figura 5. Esquema ilustrativo de la ubicación genómica del candidato a virulencia más inducido PSPTO1385
+	
 
 
 ## 12. Discusión
@@ -448,12 +483,19 @@ Los resultados dependen de la calidad de los datos públicos y de las anotacione
 
 ## 13. Conclusiones
 
-<!-- AYUDA: Sinteticen qué se aprendió, qué preguntas se respondieron y si se
-alcanzaron los objetivos. Incluyan aportes, limitaciones y trabajo futuro. No
-introduzcan resultados nuevos.
-EJEMPLO: El flujo permitió identificar..., pero será necesario incorporar... -->
+Con los resultados obtenidos del análisis de expresión diferencial y enriquecimiento funcional se cumplieron con los objetivos y preguntas de investigación.
 
-> Estado: pendiente. Se completará al finalizar el proyecto.
+A partir del análisis de expresión diferencial realizado con la herramienta Inmooose se encontraron 1458 genes, 830 inducidos y 628 reprimidos que responde a nuestra
+primera pregunta de investigación.
+
+Para conocer en que procesos estaba implicados, se realizó un enriquecimiento con KEGG  para asociar los genes cuyo patrón sea diferenciado del control con rutas biológicas, de los cuales solo 525 tenían anotación en la base de datos. Además, se encontraron 54 genes forman parte del Sistema de Secreción Tipo 3 (SST3), asociado a la patogenicidad, 
+lo que contesta nuestra segunda pregunta de investigación, donde en la infección a la planta existe una mayor inducción de genes asociados a 
+la patogenicidad. 
+
+Se obtuvieron genes candidatos que podrían estar asociados a la virulencia por su patrón de expresión. Especialmente al analizar la ubicación cromosómica de PSPTO1385, se encontró en una región cercana con el SST3 que representa un logfoldchange de 6.32, el gen sin anotación más inducido. Lo que responde a nuestra 
+tercera pregunta de investigación, sin embargo, es necesario realizar otros análisis en trabajos futuros para poder caracterizar de mejor manera su función 
+y comprobar que es un gen asociado a la patogénesis que por ahora únicamente se cataloga como candidato, por ejemplo se podría hacer un BLASTN para 
+conocer si tiene algún homólogo en otra cepa o bacteria y se podría elucidar su función o realizar una búsqueda más exhaustiva en otras bases de datos.
 
 
 ## 14. Disponibilidad, licencia y citación

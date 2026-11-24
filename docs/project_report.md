@@ -200,9 +200,8 @@ EJEMPLO: Un programa modular recibirá identificadores, descargará archivos,
 extraerá genes, almacenará resultados y generará visualizaciones. -->
 
 1. Existe variación entre las muestras de la condición _in planta_ debido a la diferencia de la profundidad de las lecturas, es por ello que se implementará inmoose, donde internamente normaliza los datos antes de hacer el DEG.
-2. La reducida cantidad de muestras control en el dataset, se puede solucionar de diferentes formas (aún sigue en evaluación la más óptima):
-   a) Con datos externos: Complementar los datos del cultivo KB con datos obtenidos en algún otro estudio.
-   b) Con datos del artículo: Complementar los datos de bacteria WT en KB, con datos de cepas mutadas de bacteria en KB [13 vs 10], pero se tendría que cambiar el enfoque 		 de la pregunta y objetivo de investigación.
+2. La reducida cantidad de muestras control en el dataset: debido al análisis preliminar como control de calidad de los datos, se observó que estaban muy separadas las muestras
+3. por lo que no se consideró necesario obtener más datos de otros datasets o otras condiciones que metieran más ruido al análisis, se optó por usar la dispersión y encogimiento bayesiano para mitigar (aunque no lo erradica) el problema de tener solo 2 muestras como control
 
 ### 7.1 Resultado o producto esperado
 
@@ -379,6 +378,8 @@ El PCA confirmó la separación esperada y descartó réplicas atípicas; los an
 ***Validación estadística del análisis de expresión diferencial:*** Se verificó la correspondencia entre los identificadores génicos y las anotaciones funcionales utilizadas para interpretar los resultados de expresión diferencial.La integración con KEGG se realizó mediante tablas que relacionan los identificadores de las rutas biológicas con sus nombres y los genes asociados a cada una.
 El análisis de enriquecimiento funcional permite identificar rutas sobrerrepresentadas entre los genes diferencialmente expresados. Su significancia se evalúa mediante valores de probabilidad ajustados por comparaciones múltiples, considerando el conjunto de genes de referencia utilizado.
 
+***Validación del modelo mediante controles biológicos:*** Se definieron dos conjuntos de genes con comportamiento conocido para comprobar que el análisis recupera la señal esperada. Como controles positivos se emplearon reguladores y factores de virulencia que deben inducirse durante la infección: *hrpL* (PSPTO1404), regulador maestro del sistema de secreción tipo III; *avrPto1* (PSPTO4001), efector; *cmaA* (PSPTO4709), biosíntesis de coronatina; y *pvdS* (PSPTO2133), adquisición de hierro. Como controles negativos se emplearon dos genes de mantenimiento celular: *gyrA* (PSPTO1745) y *gap* (PSPTO1287). El resultado de esta verificación se reporta en la sección 11 y se guarda en `results/tables/validacion_controles.csv`.
+
 ## 10. Plan de trabajo
 
 
@@ -399,7 +400,7 @@ EJEMPLO: Ana desarrolla la descarga y revisa el módulo de visualización. -->
 
 | Riesgo | Probabilidad |	Impacto	|	Prevención o alternativa
 |	--	|	--	|	--	|	--	|	
-|	Pocas réplicas en condición de control, que puede reducir el poder estadístico	|	Media	|	Alto	|	Consultar a alguien con experiencia en análisis de Expresión Diferencial. Usar la correción por múltiples pruebas. Complementar con datos _in vitro_ de otro estudio, o incorporar cepas mutantes en KB.
+|	Pocas réplicas en la condición de control (13 _in planta_ frente a 2 en King's B), lo que reduce el poder estadístico	|	Alta	|	Alto	|	Usar InMoose, cuyo encogimiento bayesiano estima la dispersión de cada gen combinando su variabilidad observada con la tendencia del conjunto de genes. Esto rescató 1448 genes cuya estimación individual resultaba imposible con dos réplicas. Complementariamente, se evaluó ampliar el control con cepas mutantes crecidas en King's B y se documentó la decisión de conservar el diseño original.
 |	Desbalance entre condiciones y variación en la profundidad de secuenciación entre muestras _in planta_	|	Media	|	Medio	|	Normalizar con InMoose antes del análisis diferencial. Revisar la profundidad y la mediana de conteos en el control de calidad y descartar réplicas atípicas con el PCA.	
 |	Dependencia total de la calidad y el diseño de datos públicos (Nobori _et al._, 2018), sin posibilidad de repetir o ampliar el experimento	|	Medio	|	Alto	|	Aclarar la fuente de los datos. Verificar el control de calidad del dataset. Apegarse a las condiciones del estudio
 |	Anotación funcional incompleta: genes hipotéticos o sin función asignada, y desajustes al unir la matriz de conteos con GenBank	|	Alta	|	Medio	|	Unir por el identificador _locus tag_ antiguo, documentar los genes sin correspondencia y conservar la fuente de cada anotación. Presentar los genes hipotéticos como candidatos, sin asegurar su función.
@@ -414,34 +415,51 @@ EJEMPLO: Tabla de presencia y ausencia generada por src/compare_genes.py.
 PRIMERA SESIÓN: dejen esta sección como pendiente. -->
 
 
-1. Tabla de expresión diferencial de los genes anotada, a partir del análisis de expresión diferencial realizado con Inmoose se encontraron 1458 genes,
-   830 inducidos y 628 reprimidos se encontraron 1458 genes, 830 inducidos y 628 reprimidos, además se realizaron gráficos que ayudan a la interpretación
-   de resultados por medio de un Volcano plot y Heatmap, se muestran los resultados:
-   
+1. **Tabla de expresión diferencial anotada.** De los 5394 genes evaluados, 4967 obtuvieron un valor de significancia corregido; los 427 restantes fueron apartados por el filtrado independiente del modelo por carecer de poder estadístico. Aplicando los umbrales de FDR < 0.05 y |log2FoldChange| > 1 se identificaron **1458 genes diferencialmente expresados: 830 inducidos y 628 reprimidos** durante la infección. Los resultados completos se encuentran en `results/tables/deg_results_completa.csv` y el subconjunto significativo en `deg_results_significativos.csv`. Para su interpretación visual se generaron un volcano plot y un mapa de calor:
+
 	<img width="714" height="564" alt="imagen" src="https://github.com/user-attachments/assets/29a603cf-7f18-49e5-bb50-8e996eea29b0" />
 	Figura 1. Volcano plot de los genes inducidos y reprimidos a partir del análisis de expresión diferencial
 	<img width="1129" height="441" alt="imagen" src="https://github.com/user-attachments/assets/142c00d0-6d39-4e1a-90be-d90469c92eb6" />
-	Figura 2. Heatmaps, de lado izquierdo se muestran los 20 genes más inducidos, de lado derecho los 20 genes más reprimidos 
- 
-2. A partir de la tabla de expresión diferencial de los genes, se analizaron sus funciones y rutas biológicas a las que se
-   les pueda asociar los genes con un patrón de expresión diferente al control por medio de un enriquecimiento que se muestran
-   procesos biológicos claros, a partir de los genes expresados diferencialmente solo 525 tenían anotación en la base de datos.
-   Además, se encontraron 54 genes forman parte del Sistema de Secreción Tipo 3 (SST3), asociado a la patogenicidad, para su visualización
-   se realizarán scatter plots, a continuación se muestran los resultados:
-   
-   <img width="1396" height="615" alt="imagen" src="https://github.com/user-attachments/assets/82d2f5b7-e1f6-4c56-b3ef-c78392e2704c" />
-	Figura 3. Scatter plot de enriquecimiento con KEGG de genes inducidos
-	<img width="1132" height="514" alt="imagen" src="https://github.com/user-attachments/assets/47d15963-db72-41b5-a466-70ddd0c736ca" />
-   	Figura 4. Scatter plot de enriquecimiento con KEGG de genes reprimidos
+	Figura 2. Heatmaps, de lado izquierdo se muestran los 20 genes más inducidos, de lado derecho los 20 genes más reprimidos
 
-3. Para poder determinar genes sin anotación cuya expresión sea desconocida como candidatos a ser virulentos se analizó su expresión
-   de genes claramente inducidos en la infección. El gen con el identificador PSPTO1385 presentó una mayor expresión, por lo que
-   se buscó la ubicación genómica, cercana a los genes pertenecientes al Sistema de Secreción Tipo 3 (SST3), un indicio importante de
-   su función o su asociación a virulencia.
+2. **Validación con controles biológicos.** Los cuatro controles positivos resultaron inducidos con significancia alta y en el orden de magnitud descrito en la literatura para la activación del regulón *hrp* durante la colonización del apoplasto:
+
+| Locus | Gen | Función | log2FC | FDR | Clasificación |
+|:--|:--|:--|--:|--:|:--|
+| PSPTO2133 | *pvdS* | Adquisición de hierro | +6.86 | 1.2 × 10⁻⁶⁸ | Inducido |
+| PSPTO4001 | *avrPto1* | Efector tipo III | +6.05 | 4.2 × 10⁻⁹⁶ | Inducido |
+| PSPTO4709 | *cmaA* | Biosíntesis de coronatina | +5.68 | 4.9 × 10⁻¹⁸⁰ | Inducido |
+| PSPTO1404 | *hrpL* | Regulador maestro del T3SS | +4.90 | 2.3 × 10⁻⁶¹ | Inducido |
+| PSPTO1287 | *gap* | Gliceraldehído-3-fosfato deshidrogenasa | +1.44 | 6.6 × 10⁻⁹ | Inducido |
+| PSPTO1745 | *gyrA* | ADN girasa, subunidad A | +0.99 | 1.8 × 10⁻⁷ | Sin cambio |
+
+De los controles negativos, *gyrA* se mantuvo por debajo del umbral de cambio. *gap* lo superó ligeramente, con +1.44; dado que la gliceraldehído-3-fosfato deshidrogenasa participa en la glucólisis y su expresión depende del estado metabólico, no constituye un gen constitutivo en sentido estricto, por lo que un cambio moderado entre dos ambientes tan distintos es esperable.
+ 
+3. **Enriquecimiento funcional de rutas KEGG.** A partir de la tabla de expresión diferencial se evaluó qué rutas biológicas están sobrerrepresentadas entre los genes que cambian su expresión, mediante un análisis de sobrerrepresentación (ORA) con prueba hipergeométrica y corrección por comparaciones múltiples. Entre los genes inducidos destacan rutas asociadas con la síntesis proteica (ribosoma), el metabolismo del carbono, la glucólisis/gluconeogénesis, el ciclo del ácido cítrico y la biosíntesis de metabolitos secundarios. Adicionalmente se identificaron 54 genes pertenecientes al Sistema de Secreción Tipo III (SST3), el principal mecanismo de virulencia de la bacteria. Los resultados se encuentran en `results/tables/ora_significant_pathways.csv` y la clasificación del SST3 en `degs_t3ss_clasificados.csv` y `resumen_t3ss.csv`:
+
+   <img width="1396" height="615" alt="imagen" src="https://github.com/user-attachments/assets/82d2f5b7-e1f6-4c56-b3ef-c78392e2704c" />
+   
+   Figura 3. Rutas KEGG enriquecidas entre los genes inducidos durante la infección.
+   
+   <img width="1132" height="514" alt="imagen" src="https://github.com/user-attachments/assets/47d15963-db72-41b5-a466-70ddd0c736ca" />
+   
+   Figura 4. Rutas KEGG enriquecidas entre los genes reprimidos durante la infección.
+
+4. **Genes sin función asignada como candidatos a virulencia.** De los 5394 genes evaluados, 525 están anotados únicamente como proteína hipotética, **122 presentan expresión diferencial** (31 inducidos y 91 reprimidos). Para priorizar candidatos se examinó el contexto genómico de los de mayor cambio, bajo el criterio de que en bacterias los genes contiguos suelen compartir regulación. El candidato principal es **PSPTO1385** (log2FoldChange = +6.32), la proteína hipotética más inducida de toda la tabla, que se localiza dentro de la isla de patogenicidad *hrp* flanqueada por genes estructurales del SST3 y se coinduce con ellos a magnitud equivalente. Un segundo candidato, PSPTO1372 (+5.40), se ubica entre un efector HopN1 y una chaperona CesT. Los resultados se encuentran en `results/tables/degs_funcion_desconocida.csv`:
+
+| Locus | Producto anotado | log2FC |
+|:--|:--|--:|
+| PSPTO1383 | Subunidad de la varilla interna del SST3 | +6.56 |
+| PSPTO1384 | Anillo de membrana interna del SST3 | +4.37 |
+| **PSPTO1385** | **Proteína hipotética** | **+6.32** |
+| PSPTO1386 | Proteína estatórica SctL del SST3 | +6.20 |
+| PSPTO1387 | Proteína HrpF de secreción tipo III | +5.83 |
+
+   Tabla 1. Contexto genómico del candidato PSPTO1385 y comportamiento de sus genes vecinos.
 
    <img width="1093" height="376" alt="imagen" src="https://github.com/user-attachments/assets/78c3d18c-d5bb-4698-90ee-dedead717cd5" />
-   Figura 5. Esquema ilustrativo de la ubicación genómica del candidato a virulencia más inducido PSPTO1385
-	
+   
+   Figura 5. Ubicación genómica de PSPTO1385 dentro de la isla de patogenicidad *hrp*.
 
 
 ## 12. Discusión

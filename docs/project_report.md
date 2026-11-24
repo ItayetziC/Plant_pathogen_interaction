@@ -293,8 +293,28 @@ Plant_pathogen_interaction/
 ├── codemeta.json    # Metadata del software
 └── requirements.txt # Lista de librerías requeridas
 ```
-Para obtener los archivos no versionados: 
-Ejecutar `notebooks/01_descarga.ipynb` en orden, de la celda 0 a la 13 (con las dependencias descritas en el README en reproducción de resultados) . Las carpetas `data/raw/`, `data/processed/` y `results/` se crean automáticamente si no existen.
+
+El flujo se ejecuta desde cinco notebooks numerados que importan las funciones de src/. 
+Deben ejecutarse en orden, porque cada uno utiliza los archivos generados del anterior. 
+Desde la raíz del repositorio, se muestra un ejemplo:
+
+```bash
+jupyter notebook notebooks/01_descarga.ipynb
+```
+El comando generará la descarga de datos de Geo y registros de GenBank seleccionados (ver _docs/project_report_) y limpia muestras depositados en _data/raw_ y _data/processed_.  
+
+|Notebook |	Qué hace |
+|:--|:--|
+| 01_descarga.ipynb	| Descarga los datos de GEO y los registros GenBank, selecciona y limpia las muestras, construye la anotación funcional y evalúa la calidad con un PCA |
+| 02_DEGs.ipynb	| Normaliza, estima la dispersión, ajusta el modelo binomial negativo, aplica la prueba de Wald y guarda la tabla de resultados |
+| 03_graficas.ipynb	| Genera el volcano plot, el mapa de calor y la figura de candidatos sin función asignada |
+| 04_KEGG.ipynb |	Obtiene las asociaciones gen-ruta de KEGG y ejecuta el análisis de sobrerrepresentación |
+| 05_analisis_funcional.ipynb |	Clasifica los genes del sistema de secreción tipo III e identifica los de función desconocida |
+
+#### Scripts usados
+Las funciones están en src/ y los notebooks solo las llaman. 
+Cada función está documentada con su propósito, sus parámetros de entrada y su valor de retorno, y valida sus entradas lanzando excepciones con un mensaje que indica cómo corregir 
+el problema.
 
 ### 8.4 Diccionario o formato de los datos
 

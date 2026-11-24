@@ -439,7 +439,8 @@ De los controles negativos, *gyrA* se mantuvo por debajo del umbral de cambio. *
  
 3. **Enriquecimiento funcional de rutas KEGG.** A partir de la tabla de expresión diferencial se evaluó qué rutas biológicas están sobrerrepresentadas entre los genes que cambian su expresión, mediante un análisis de sobrerrepresentación (ORA) con prueba hipergeométrica y corrección por comparaciones múltiples. Entre los genes inducidos destacan rutas asociadas con la síntesis proteica (ribosoma), el metabolismo del carbono, la glucólisis/gluconeogénesis, el ciclo del ácido cítrico y la biosíntesis de metabolitos secundarios. Adicionalmente se identificaron 54 genes pertenecientes al Sistema de Secreción Tipo III (SST3), el principal mecanismo de virulencia de la bacteria. Los resultados se encuentran en `results/tables/ora_significant_pathways.csv` y la clasificación del SST3 en `degs_t3ss_clasificados.csv` y `resumen_t3ss.csv`:
 
-   <img width="1396" height="615" alt="imagen" src="https://github.com/user-attachments/assets/82d2f5b7-e1f6-4c56-b3ef-c78392e2704c" />
+	<img width="1221" height="514" alt="imagen" src="https://github.com/user-attachments/assets/e821e55f-066e-4e67-8478-b307291c4ae3" />
+
    
    Figura 3. Rutas KEGG enriquecidas entre los genes inducidos durante la infección.
    

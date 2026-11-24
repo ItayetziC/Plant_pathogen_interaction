@@ -418,11 +418,13 @@ PRIMERA SESIÓN: dejen esta sección como pendiente. -->
 1. **Tabla de expresión diferencial anotada.** De los 5394 genes evaluados, 4967 obtuvieron un valor de significancia corregido; los 427 restantes fueron apartados por el filtrado independiente del modelo por carecer de poder estadístico. Aplicando los umbrales de FDR < 0.05 y |log2FoldChange| > 1 se identificaron **1458 genes diferencialmente expresados: 830 inducidos y 628 reprimidos** durante la infección. Los resultados completos se encuentran en `results/tables/deg_results_completa.csv` y el subconjunto significativo en `deg_results_significativos.csv`. Para su interpretación visual se generaron un volcano plot y un mapa de calor:
 
 	<img width="714" height="564" alt="imagen" src="https://github.com/user-attachments/assets/29a603cf-7f18-49e5-bb50-8e996eea29b0" />
+	
 	Figura 1. Volcano plot de los genes inducidos y reprimidos a partir del análisis de expresión diferencial
+
 	<img width="1129" height="441" alt="imagen" src="https://github.com/user-attachments/assets/142c00d0-6d39-4e1a-90be-d90469c92eb6" />
 	Figura 2. Heatmaps, de lado izquierdo se muestran los 20 genes más inducidos, de lado derecho los 20 genes más reprimidos
 
-2. **Validación con controles biológicos.** Los cuatro controles positivos resultaron inducidos con significancia alta y en el orden de magnitud descrito en la literatura para la activación del regulón *hrp* durante la colonización del apoplasto:
+3. **Validación con controles biológicos.** Los cuatro controles positivos resultaron inducidos con significancia alta y en el orden de magnitud descrito en la literatura para la activación del regulón *hrp* durante la colonización del apoplasto:
 
 | Locus | Gen | Función | log2FC | FDR | Clasificación |
 |:--|:--|:--|--:|--:|:--|

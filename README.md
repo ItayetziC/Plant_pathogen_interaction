@@ -75,7 +75,7 @@ El comando generará la descarga de datos de Geo y registros de GenBank seleccio
 
 |Notebook |	Qué hace |
 |:--|:--|
-| 01_descarga.ipynb	| Descarga los datos de GEO y los registros GenBank, selecciona y limpia las muestras, construye la anotación funcional y evalúa la calidad con un PCA |
+| 01_descarga.ipynb	| Descarga los datos de GEO y los registros GenBank, selecciona y limpia las muestras, construye la anotación funcional y se elaboran graficos para evaluar la calidad de los datos (PCA, Profundidad y Mediana de conteos por gen) |
 | 02_DEGs.ipynb	| Normaliza, estima la dispersión, ajusta el modelo binomial negativo, aplica la prueba de Wald y guarda la tabla de resultados |
 | 03_graficas.ipynb	| Genera el volcano plot, el mapa de calor y la figura de candidatos sin función asignada |
 | 04_KEGG.ipynb |	Obtiene las asociaciones gen-ruta de KEGG y ejecuta el análisis de sobrerrepresentación |

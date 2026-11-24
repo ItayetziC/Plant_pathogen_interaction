@@ -64,7 +64,7 @@
     "license": "https://spdx.org/licenses/MIT",
     "name": "Analisis transcriptomico diferencial de Pseudomonas syringae durante la infeccion de Arabidopsis thaliana",
     "operatingSystem": "Windows",
-    "programmingLanguage": "Python version 3.13",
+    "programmingLanguage": "Python version 3.14.7",
     "relatedLink": "https://github.com/ItayetziC/Plant_pathogen_interaction/blob/main/README.md",
     "version": "3.3.0",
     "issueTracker": "https://github.com/ItayetziC/Plant_pathogen_interaction/issues"

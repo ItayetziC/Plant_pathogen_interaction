@@ -323,24 +323,49 @@ def plot_candidatos(results: pd.DataFrame,
         ax.spines[lado].set_visible(False)
     return ax
 
+
 def plot_kegg_enrichment(results_df, title, ax=None):
     """
-    Genera un dot plot de rutas KEGG significativamente enriquecidas.
+    Genera un gráfico de puntos para visualizar las rutas
+    KEGG significativamente enriquecidas.
 
-    Parametros
+    Parameters
     ----------
     results_df : pandas.DataFrame
-        Resultados del analisis ORA.
+        Tabla de resultados del enriquecimiento KEGG.
     title : str
         Titulo de la grafica.
-    ax : matplotlib.axes.Axes, opcional
-        Eje sobre el que se dibujar la grafica.
+    ax : matplotlib.axes.Axes, optional
+        Eje donde se dibujará la gráfica.
 
-    Retorna
+    Returns
     -------
     matplotlib.axes.Axes
         Eje que contiene la grafica.
+
+    Raises
+    ------
+    TypeError
+        Si results_df no es un DataFrame o title no es str.
+    ValueError
+        Si faltan columnas necesarias para generar la grafica.
     """
+    
+    if not isinstance(results_df, pd.DataFrame):
+        raise TypeError("results_df debe ser DataFrame")
+
+    required = {"padj", "pathway_name", "overlap_count"}
+    missing = required - set(results_df.columns)
+
+    if missing:
+        raise ValueError(
+            f"Faltan columnas en results_df: {sorted(missing)}. "
+            "Solución: usa la salida de run_kegg_enrichment()."
+        )
+
+    if not isinstance(title, str):
+        raise TypeError("title debe ser str")
+
     # Seleccionar las rutas significativamente enriquecidas
     significant_df = results_df.loc[
         results_df["padj"] < 0.05
@@ -397,6 +422,290 @@ def plot_kegg_enrichment(results_df, title, ax=None):
         ax=ax,
         label="-log10(FDR)"
     )
+
+    return ax
+
+
+def plot_t3ss_categories(summary_df, ax=None):
+    """
+    Visualiza la distribución de genes relacionados con el sistema
+    de secreción tipo III (T3SS) segun su categoria funcional
+    y regulacion diferencial.
+
+    Genera una grafica de barras horizontales apiladas que representa
+    el numero de genes inducidos y reprimidos en cada categoria:
+    efectores, componentes estructurales y de exportación,
+    chaperonas y reguladores.
+
+    Si alguna de las columnas de regulacion ('inducido' o
+    'reprimido') no está presente, se incorpora con valores
+    iguales a cero.
+
+    Parameters
+    ----------
+    summary_df : pandas.DataFrame
+        Tabla resumen con las categorias funcionales del T3SS
+        como índice y los conteos de genes inducidos y reprimidos
+        como columnas.
+    ax : matplotlib.axes.Axes, optional
+        Eje sobre el cual se dibujará la gráfica. Si no se
+        proporciona, se crea una nueva figura.
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+        Eje que contiene la grafica de barras apiladas.
+
+    Raises
+    ------
+    TypeError
+        Si summary_df no es un DataFrame o si las columnas
+        de regulación contienen valores no numéricos.
+    ValueError
+        Si las columnas de regulación contienen conteos negativos.
+    """
+
+    if not isinstance(summary_df, pd.DataFrame):
+        raise TypeError("summary_df debe ser DataFrame")
+
+    for column in ("inducido", "reprimido"):
+        if column in summary_df.columns:
+            if not pd.api.types.is_numeric_dtype(summary_df[column]):
+                raise TypeError(
+                    f"La columna {column} debe contener valores numericos"
+                )
+
+            if (summary_df[column] < 0).any():
+                raise ValueError(
+                    f"La columna {column} contiene conteos negativos"
+                )
+    # Crear una copia de la tabla
+    plot_df = summary_df.copy()
+
+    # Asegurar que ambas categorías de regulación estén presentes
+    for column in ["inducido", "reprimido"]:
+        if column not in plot_df.columns:
+            plot_df[column] = 0
+
+    # Ordenar las categorías funcionales
+    category_order = [
+        "Efectores",
+        "Componentes estructurales y exportacion",
+        "Chaperonas",
+        "Reguladores"
+    ]
+
+    plot_df = plot_df.reindex(category_order, fill_value=0)
+
+    # Crear la figura cuando no se proporciona un eje
+    if ax is None:
+        _, ax = plt.subplots(figsize=(10, 5))
+
+    # Dibujar las barras horizontales apiladas
+    ax.barh(
+        plot_df.index,
+        plot_df["inducido"],
+        label="Inducidos",
+        color="#2C493B"
+    )
+
+    ax.barh(
+        plot_df.index,
+        plot_df["reprimido"],
+        left=plot_df["inducido"],
+        label="Reprimidos",
+        color="#591A24"
+    )
+
+    # Agregar el total de genes al final de cada barra
+    for index, (_, row) in enumerate(plot_df.iterrows()):
+        total = row["inducido"] + row["reprimido"]
+
+        ax.text(
+            total + 0.3,
+            index,
+            str(int(total)),
+            va="center"
+        )
+
+    # Configurar las etiquetas
+    ax.set_xlabel("Numero de genes diferencialmente expresados")
+    ax.set_ylabel("Categoria funcional")
+    ax.set_title("Clasificacion funcional de genes relacionados con T3SS")
+
+    ax.legend()
+    ax.invert_yaxis()
+    ax.set_xlim(0, plot_df.sum(axis=1).max() + 4)
+
+    return ax
+
+
+def plot_genomic_context(context_df, target_locus="PSPTO1385", ax=None):
+    """
+    Representa el contexto genomico de un gen de interes y sus
+    genes vecinos mediante un esquema de organizacion cromosomica.
+
+    Genera una representacion grafica de los genes presentes
+    en una region del cromosoma, para indicar su posicion,
+    longitud y orientación de transcripcion.
+
+    Parameters
+    ----------
+    context_df : pandas.DataFrame
+        Tabla con la informacion genomica y de expresion diferencial.
+        Debe contener las columnas 'locus_key', 'start', 'end',
+        'strand', 'regulacion' y 'log2FoldChange'.
+    target_locus : str, optional
+        Identificador del gen de interes que se desea resaltar.
+        Por defecto es 'PSPTO1385'.
+    ax : matplotlib.axes.Axes, optional
+        Eje sobre el cual se dibujara el contexto genomico.
+        Si no se proporciona, se crea una nueva figura.
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+        Eje que contiene la representacion del contexto genomico.
+
+    Raises
+    ------
+    TypeError
+        Si context_df no es un DataFrame.
+    ValueError
+        Si la tabla esta vacia, faltan columnas necesarias
+        o el gen de interés no está presente en context_df.
+    """
+
+    if not isinstance(context_df, pd.DataFrame):
+        raise TypeError("context_df debe ser DataFrame")
+
+    required = {
+        "start", "end", "strand", "regulacion",
+        "locus_key", "log2FoldChange"
+    }
+    missing = required - set(context_df.columns)
+
+    if missing:
+        raise ValueError(
+            f"Faltan columnas en context_df: {sorted(missing)}. "
+            "Solución: usa la salida de prepare_genomic_context()."
+        )
+
+    if context_df.empty:
+        raise ValueError("No hay genes para representar.")
+
+    if target_locus not in context_df["locus_key"].values:
+        raise ValueError(
+            f"No se encontró el gen {target_locus} en context_df."
+        )
+
+    if context_df.empty:
+        raise ValueError("No hay genes para representar.")
+
+    # Crear la figura
+    if ax is None:
+        _, ax = plt.subplots(figsize=(13, 4.5))
+
+    # Definir los colores según la regulación
+    regulation_colors = {
+        "inducido": "#2C493B",
+        "reprimido": "#591A24",
+        "sin cambio": "#A0A0A0"
+    }
+
+    region_start = context_df["start"].min()
+    region_end = context_df["end"].max()
+
+    # Dibujar la línea que representa el cromosoma
+    ax.plot(
+        [region_start, region_end],
+        [0, 0],
+        color="gray",
+        linewidth=1.5,
+        zorder=1
+    )
+
+    # Representar cada gen
+    for _, gene in context_df.iterrows():
+
+        start = gene["start"]
+        end = gene["end"]
+        strand = gene["strand"]
+
+        # Determinar la dirección de transcripción
+        if strand == 1:
+            x = start
+            dx = end - start
+        elif strand == -1:
+            x = end
+            dx = start - end
+        else:
+            continue
+
+        regulation = gene["regulacion"]
+
+        color = regulation_colors.get(
+            regulation,
+            "#A0A0A0"
+        )
+
+        is_target = gene["locus_key"] == target_locus
+
+        # Crear la flecha que representa el gen
+        arrow = FancyArrow(
+            x,
+            0,
+            dx,
+            0,
+            width=0.20,
+            head_width=0.32,
+            head_length=min(70, abs(dx) * 0.3),
+            length_includes_head=True,
+            facecolor=color,
+            edgecolor="black" if is_target else "none",
+            linewidth=2 if is_target else 0,
+            zorder=3
+        )
+
+        ax.add_patch(arrow)
+
+        # Calcular el centro del gen
+        center = (start + end) / 2
+
+        # Mostrar el identificador
+        ax.text(
+            center,
+            0.24,
+            gene["locus_key"],
+            ha="center",
+            va="bottom",
+            fontsize=9,
+            rotation=45
+        )
+
+        # Mostrar el cambio de expresión
+        if pd.notna(gene["log2FoldChange"]):
+            ax.text(
+                center,
+                -0.28,
+                f'{gene["log2FoldChange"]:+.2f}',
+                ha="center",
+                va="top",
+                fontsize=9
+            )
+
+    # Configurar los ejes
+    ax.set_xlim(region_start - 150, region_end + 150)
+    ax.set_ylim(-0.65, 0.95)
+    ax.set_yticks([])
+
+    ax.set_xlabel("Posicion en el cromosoma (pb)")
+    ax.set_title(
+        f"Contexto genomico y expresion diferencial de {target_locus}",
+        pad=18
+    )
+
+    ax.ticklabel_format(style="plain", axis="x")
 
     return ax
 

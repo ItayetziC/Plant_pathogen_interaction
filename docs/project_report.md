@@ -12,21 +12,17 @@ Escherichia coli. -->
 | Integrante 2 | Leilani Cruz Ramírez leilanic@lcg.unam.mx |
 | Integrante 3 | Andrómeda Coral Gutiérrez andcoral@lcg.unam.mx |
 | Fecha de creación | 25/08/2026 |
-| Última actualización | 19/10/2026 |
+| Última actualización | 23/11/2026 |
 | Repositorio | https://github.com/ItayetziC/Plant_pathogen_interaction |
 
 <!-- AYUDA: Mantengan actualizados el estado, la fecha y la versión. La versión
 debe coincidir con una etiqueta de Git cuando exista una entrega identificable. -->
 
 ## Resumen del proyecto
-
-<!-- AYUDA: Expliquen en un párrafo el problema, su relevancia, los datos, la
-solución propuesta y el resultado principal. Conviene actualizarlo al final.
-EJEMPLO: Se analizarán genomas de E. coli disponibles en NCBI para identificar
-y comparar genes de resistencia. Se desarrollará un flujo reproducible en Python
-que obtenga los datos y genere tablas y visualizaciones comparativas. -->
-
-[Redacten aquí el resumen.]
+Análisis transcriptómico diferencial en Python de _Pseudomonas syringae_ pv. tomato DC3000 durante la infeccion de _Arabidopsis thaliana_. 
+Integra datos públicos de RNA-seq (GEO GSE103441), análisis estadístico de expresión diferencial mediante InMoose, anotación funcional (RefSeq GCF_000007805.1) 
+y enriquecimiento de rutas biológicas con KEGG, así como herramientas de visualización para explorar los mecanismos moleculares asociados con la interacción 
+planta-patógeno.
 
 ## 1. Contexto y antecedentes
 
@@ -204,9 +200,8 @@ EJEMPLO: Un programa modular recibirá identificadores, descargará archivos,
 extraerá genes, almacenará resultados y generará visualizaciones. -->
 
 1. Existe variación entre las muestras de la condición _in planta_ debido a la diferencia de la profundidad de las lecturas, es por ello que se implementará inmoose, donde internamente normaliza los datos antes de hacer el DEG.
-2. La reducida cantidad de muestras control en el dataset, se puede solucionar de diferentes formas (aún sigue en evaluación la más óptima):
-   a) Con datos externos: Complementar los datos del cultivo KB con datos obtenidos en algún otro estudio.
-   b) Con datos del artículo: Complementar los datos de bacteria WT en KB, con datos de cepas mutadas de bacteria en KB [13 vs 10], pero se tendría que cambiar el enfoque 		 de la pregunta y objetivo de investigación.
+2. La reducida cantidad de muestras control en el dataset: debido al análisis preliminar como control de calidad de los datos, se observó que estaban muy separadas las muestras
+3. por lo que no se consideró necesario obtener más datos de otros datasets o otras condiciones que metieran más ruido al análisis, se optó por usar la dispersión y encogimiento bayesiano para mitigar (aunque no lo erradica) el problema de tener solo 2 muestras como control
 
 ### 7.1 Resultado o producto esperado
 
@@ -215,7 +210,13 @@ base de datos, visualizaciones u otro producto.
 EJEMPLO: Repositorio ejecutable con scripts, datos de prueba, documentación,
 tabla comparativa y figuras regenerables. -->
 
-[Describan aquí el producto.]
+1. Se espera un repositorio ejecutable por medio de scripts y notebooks que sea reproducible y tenga una documencación descriptiva.
+   Además las figuras y resultados serán regenerables. Así como el uso de comprobaciones y aviso de errores explícito. 
+2. Se descargarán los datos esperados, se realizará el análisis de expresión diferencial por medio de inmoose y para su visualización
+   de usarán Volcano plot y Heatmaps
+3. Para el enriquecimiento funcional con los genes con patrón de expresión diferencial se visualizará por medio de scatter plots.
+4. Como parte de la obtención de genes sin anotación a candidatos virulentos se analizará su patrón de expresión y ubicación genómica,
+   además de gráficos visuales que lo comprueben. 
 
 
 ## 8. Datos
@@ -288,7 +289,8 @@ Plant_pathogen_interaction/
 ├── tests/           # Pruebas
 ├── CITATION.cff     # Información para citar el software
 ├── LICENSE          # Licencia
-└── README.md        # Introducción y guía rápida de uso
+├── README.md        # Introducción y guía rápida de uso
+├── codemeta.json    # Metadata del software
 └── requirements.txt # Lista de librerías requeridas
 ```
 Para obtener los archivos no versionados: 
@@ -340,6 +342,9 @@ El análisis se organiza en seis etapas. Las primeras tres preparan y validan lo
 	El análisis de enriquecimiento identifica qué funciones biológicas aparecen sobrerrepresentadas entre los genes diferencialmente expresados, y responde la **Pregunta 2** (funcional). 
 	El filtrado de los genes anotados como proteína hipotética que resultan inducidos durante la infección responde la **Pregunta 3** (exploratoria), al priorizar candidatos para caracterización funcional posterior.
 
+**Figura de la estrategia metodológica** Se divide en 3 fases la obtención de datos (Etapa 1-3), Análisis de expresión diferencial (Etapa 4) e 
+Interpretación (Etapa 5 y 6) 
+<img width="1110" height="628" alt="imagen" src="https://github.com/user-attachments/assets/3137d5cb-53ab-4494-a640-af15b075c6a5" />
 
 ### 9.2 Herramientas y tecnologías
 
@@ -352,17 +357,29 @@ visualización. -->
 |:--|:--|:--|
 | Python | 3.14.7 | Para la ejecución de código |
 | Jupyter Notebook | 7.6.3 | Dividir el código en partes |
-| Biopython | 1.86 | Acceder a Entrez | 
-| Pandas | 3.0.6 | Manipulación y análisis de datos tabulares |
-| Matplotlib.pyplot | 3.11.2 | Crear y modificar gráficos
-| Numpy | 2.5.2 | Manejo de datos y cálculos numéricos
-
+| Biopython | 1.88 | Acceder a Entrez | 
+| Pandas | 2.3.3 | Manipulación y análisis de datos tabulares |
+| Matplotlib.pyplot | 3.10.6 | Crear y modificar gráficos |
+| Numpy | 2.5.2 | Manejo de datos y cálculos numéricos |
+| Scipy | 1.16.3 | Cálculos matemáticos avanzados sobre arreglos de NumPy |
+| Inmoose | 0.9.1 | Análisis de expresión diferencial |
+| statsmodels | 0.14.5 | Uso obligatorio por Inmoose |
+| seaborn | 0.13.2 | Gráficos visuales y estadísticos |
 
 
 ### 9.3 Estrategia de validación
 
-Validación de datos: las 48 excepciones que verifican entradas, identificadores inexistentes y archivos incompletos que se encuentran presentes en los scripts.
-Validación de muestras: el PCA confirmó la separación esperada y descartó réplicas atípicas; los análisis preliminares determinaron que se puede comparar por profundidad de las lecturas entre muestras a pesar de la dispersión in planta.
+Para garantizar la confiabilidad de los resultados y la reproducibilidad del análisis, se implementó una estrategia de validación que contempla la integridad de los datos de entrada, el control de calidad de las muestras, la consistencia de los análisis estadísticos y la verificación de las anotaciones funcionales.
+
+***Validación de datos y funcionamiento del software:*** Se incorporaron 48 excepciones y comprobaciones en los scripts del proyecto para detectar entradas inválidas, archivos incompletos, identificadores inexistentes e inconsistencias en las estructuras de datos. Estas validaciones permiten identificar errores durante la ejecución y evitar que se propaguen hacia las etapas posteriores del análisis.
+
+***Validación de muestras y control de calidad:*** Se evaluó la profundidad de secuenciación y la distribución de los conteos por muestra para identificar diferencias técnicas que pudieran afectar las comparaciones entre condiciones experimentales. Adicionalmente, se realizó un análisis de componentes principales (PCA), mediante el cual se observó una separación entre las muestras in planta e in vitro. El primer componente principal explicó el 43.8 % de la variabilidad, lo que proporciona evidencia exploratoria de diferencias entre ambos grupos.
+El PCA confirmó la separación esperada y descartó réplicas atípicas; los análisis preliminares determinaron que se puede comparar por profundidad de las lecturas entre muestras a pesar de la dispersión in planta.
+
+***Validación estadística del análisis de expresión diferencial:*** Se verificó la correspondencia entre los identificadores génicos y las anotaciones funcionales utilizadas para interpretar los resultados de expresión diferencial.La integración con KEGG se realizó mediante tablas que relacionan los identificadores de las rutas biológicas con sus nombres y los genes asociados a cada una.
+El análisis de enriquecimiento funcional permite identificar rutas sobrerrepresentadas entre los genes diferencialmente expresados. Su significancia se evalúa mediante valores de probabilidad ajustados por comparaciones múltiples, considerando el conjunto de genes de referencia utilizado.
+
+***Validación del modelo mediante controles biológicos:*** Se definieron dos conjuntos de genes con comportamiento conocido para comprobar que el análisis recupera la señal esperada. Como controles positivos se emplearon reguladores y factores de virulencia que deben inducirse durante la infección: *hrpL* (PSPTO1404), regulador maestro del sistema de secreción tipo III; *avrPto1* (PSPTO4001), efector; *cmaA* (PSPTO4709), biosíntesis de coronatina; y *pvdS* (PSPTO2133), adquisición de hierro. Como controles negativos se emplearon dos genes de mantenimiento celular: *gyrA* (PSPTO1745) y *gap* (PSPTO1287). El resultado de esta verificación se reporta en la sección 11 y se guarda en `results/tables/validacion_controles.csv`.
 
 ## 10. Plan de trabajo
 
@@ -382,14 +399,13 @@ EJEMPLO: Ana desarrolla la descarga y revisa el módulo de visualización. -->
 
 ### 10.2 Riesgos y alternativas
 
-<!-- AYUDA: Identifiquen situaciones que podrían impedir o retrasar el proyecto
-y definan una alternativa.
-EJEMPLO: Los datos requieren demasiado almacenamiento; alternativa: reducir el
-número de genomas usando criterios documentados. -->
-
-| Riesgo | Probabilidad | Impacto | Prevención o alternativa |
-|:--|:--|:--|:--|
-| [Riesgo] | Baja/Media/Alta | Bajo/Medio/Alto | [Acción] |
+| Riesgo | Probabilidad |	Impacto	|	Prevención o alternativa
+|	--	|	--	|	--	|	--	|	
+|	Pocas réplicas en la condición de control (13 _in planta_ frente a 2 en King's B), lo que reduce el poder estadístico	|	Alta	|	Alto	|	Usar InMoose, cuyo encogimiento bayesiano estima la dispersión de cada gen combinando su variabilidad observada con la tendencia del conjunto de genes. Esto rescató 1448 genes cuya estimación individual resultaba imposible con dos réplicas. Complementariamente, se evaluó ampliar el control con cepas mutantes crecidas en King's B y se documentó la decisión de conservar el diseño original.
+|	Desbalance entre condiciones y variación en la profundidad de secuenciación entre muestras _in planta_	|	Media	|	Medio	|	Normalizar con InMoose antes del análisis diferencial. Revisar la profundidad y la mediana de conteos en el control de calidad y descartar réplicas atípicas con el PCA.	
+|	Dependencia total de la calidad y el diseño de datos públicos (Nobori _et al._, 2018), sin posibilidad de repetir o ampliar el experimento	|	Medio	|	Alto	|	Aclarar la fuente de los datos. Verificar el control de calidad del dataset. Apegarse a las condiciones del estudio
+|	Anotación funcional incompleta: genes hipotéticos o sin función asignada, y desajustes al unir la matriz de conteos con GenBank	|	Alta	|	Medio	|	Unir por el identificador _locus tag_ antiguo, documentar los genes sin correspondencia y conservar la fuente de cada anotación. Presentar los genes hipotéticos como candidatos, sin asegurar su función.
+|	Dificultades técnicas con la reproducibilidad (versiones de Python, librerías, o cambios en el formato de los archivos descargados)	|	Media	|	Medio	|		Fijar versiones en `project_report.md`, documentar la descarga en el notebook `01_descarga` y validar entradas con las excepciones ya implementadas.
 
 ## 11. Resultados
 
@@ -399,8 +415,55 @@ obtenido; interprétenlo en Discusión.
 EJEMPLO: Tabla de presencia y ausencia generada por src/compare_genes.py.
 PRIMERA SESIÓN: dejen esta sección como pendiente. -->
 
-> Estado: pendiente. Se completará durante el desarrollo.
 
+1. **Tabla de expresión diferencial anotada.** De los 5394 genes evaluados, 4967 obtuvieron un valor de significancia corregido; los 427 restantes fueron apartados por el filtrado independiente del modelo por carecer de poder estadístico. Aplicando los umbrales de FDR < 0.05 y |log2FoldChange| > 1 se identificaron **1458 genes diferencialmente expresados: 830 inducidos y 628 reprimidos** durante la infección. Los resultados completos se encuentran en `results/tables/deg_results_completa.csv` y el subconjunto significativo en `deg_results_significativos.csv`. Para su interpretación visual se generaron un volcano plot y un mapa de calor:
+
+	<img width="714" height="564" alt="imagen" src="https://github.com/user-attachments/assets/29a603cf-7f18-49e5-bb50-8e996eea29b0" />
+	
+	Figura 1. Volcano plot de los genes inducidos y reprimidos a partir del análisis de expresión diferencial
+
+	<img width="1129" height="441" alt="imagen" src="https://github.com/user-attachments/assets/142c00d0-6d39-4e1a-90be-d90469c92eb6" />
+	Figura 2. Heatmaps, de lado izquierdo se muestran los 20 genes más inducidos, de lado derecho los 20 genes más reprimidos
+
+3. **Validación con controles biológicos.** Los cuatro controles positivos resultaron inducidos con significancia alta y en el orden de magnitud descrito en la literatura para la activación del regulón *hrp* durante la colonización del apoplasto:
+
+| Locus | Gen | Función | log2FC | FDR | Clasificación |
+|:--|:--|:--|--:|--:|:--|
+| PSPTO2133 | *pvdS* | Adquisición de hierro | +6.86 | 1.2 × 10⁻⁶⁸ | Inducido |
+| PSPTO4001 | *avrPto1* | Efector tipo III | +6.05 | 4.2 × 10⁻⁹⁶ | Inducido |
+| PSPTO4709 | *cmaA* | Biosíntesis de coronatina | +5.68 | 4.9 × 10⁻¹⁸⁰ | Inducido |
+| PSPTO1404 | *hrpL* | Regulador maestro del T3SS | +4.90 | 2.3 × 10⁻⁶¹ | Inducido |
+| PSPTO1287 | *gap* | Gliceraldehído-3-fosfato deshidrogenasa | +1.44 | 6.6 × 10⁻⁹ | Inducido |
+| PSPTO1745 | *gyrA* | ADN girasa, subunidad A | +0.99 | 1.8 × 10⁻⁷ | Sin cambio |
+
+De los controles negativos, *gyrA* se mantuvo por debajo del umbral de cambio. *gap* lo superó ligeramente, con +1.44; dado que la gliceraldehído-3-fosfato deshidrogenasa participa en la glucólisis y su expresión depende del estado metabólico, no constituye un gen constitutivo en sentido estricto, por lo que un cambio moderado entre dos ambientes tan distintos es esperable.
+ 
+3. **Enriquecimiento funcional de rutas KEGG.** A partir de la tabla de expresión diferencial se evaluó qué rutas biológicas están sobrerrepresentadas entre los genes que cambian su expresión, mediante un análisis de sobrerrepresentación (ORA) con prueba hipergeométrica y corrección por comparaciones múltiples. Entre los genes inducidos destacan rutas asociadas con la síntesis proteica (ribosoma), el metabolismo del carbono, la glucólisis/gluconeogénesis, el ciclo del ácido cítrico y la biosíntesis de metabolitos secundarios. Adicionalmente se identificaron 54 genes pertenecientes al Sistema de Secreción Tipo III (SST3), el principal mecanismo de virulencia de la bacteria. Los resultados se encuentran en `results/tables/ora_significant_pathways.csv` y la clasificación del SST3 en `degs_t3ss_clasificados.csv` y `resumen_t3ss.csv`:
+
+	<img width="1221" height="514" alt="imagen" src="https://github.com/user-attachments/assets/e821e55f-066e-4e67-8478-b307291c4ae3" />
+
+   
+   Figura 3. Rutas KEGG enriquecidas entre los genes inducidos durante la infección.
+   
+   <img width="1132" height="514" alt="imagen" src="https://github.com/user-attachments/assets/47d15963-db72-41b5-a466-70ddd0c736ca" />
+   
+   Figura 4. Rutas KEGG enriquecidas entre los genes reprimidos durante la infección.
+
+4. **Genes sin función asignada como candidatos a virulencia.** De los 5394 genes evaluados, 525 están anotados únicamente como proteína hipotética, **122 presentan expresión diferencial** (31 inducidos y 91 reprimidos). Para priorizar candidatos se examinó el contexto genómico de los de mayor cambio, bajo el criterio de que en bacterias los genes contiguos suelen compartir regulación. El candidato principal es **PSPTO1385** (log2FoldChange = +6.32), la proteína hipotética más inducida de toda la tabla, que se localiza dentro de la isla de patogenicidad *hrp* flanqueada por genes estructurales del SST3 y se coinduce con ellos a magnitud equivalente. Un segundo candidato, PSPTO1372 (+5.40), se ubica entre un efector HopN1 y una chaperona CesT. Los resultados se encuentran en `results/tables/degs_funcion_desconocida.csv`:
+
+| Locus | Producto anotado | log2FC |
+|:--|:--|--:|
+| PSPTO1383 | Subunidad de la varilla interna del SST3 | +6.56 |
+| PSPTO1384 | Anillo de membrana interna del SST3 | +4.37 |
+| **PSPTO1385** | **Proteína hipotética** | **+6.32** |
+| PSPTO1386 | Proteína estatórica SctL del SST3 | +6.20 |
+| PSPTO1387 | Proteína HrpF de secreción tipo III | +5.83 |
+
+   Tabla 1. Contexto genómico del candidato PSPTO1385 y comportamiento de sus genes vecinos.
+
+   <img width="1093" height="376" alt="imagen" src="https://github.com/user-attachments/assets/78c3d18c-d5bb-4698-90ee-dedead717cd5" />
+   
+   Figura 5. Ubicación genómica de PSPTO1385 dentro de la isla de patogenicidad *hrp*.
 
 
 ## 12. Discusión
@@ -410,17 +473,51 @@ compárenlos con los antecedentes y señalen limitaciones. No repitan únicament
 los valores.
 EJEMPLO: La distribución observada sugiere..., aunque la interpretación está
 limitada por la calidad de las anotaciones. -->
+Los resultados del análisis transcriptómico diferencial de _Pseudomonas syringae pv. tomato DC3000_ permitieron explorar los cambios en la expresión génica asociados con la infección de _Arabidopsis thaliana_, así como identificar procesos biológicos y genes candidatos que podrían participar en la adaptación bacteriana al ambiente del hospedero.
 
-> Estado: pendiente. Se completará después de obtener resultados.
+***Cambios en la expresión génica durante la infección***.
+
+En relación con nuestra primera pregunta de investigación, el análisis de expresión diferencial mediante InMoose permitió identificar genes cuya expresión varía significativamente entre las condiciones in planta e in vitro. La existencia de genes inducidos y reprimidos sugiere que la bacteria modifica su programa transcripcional en respuesta a las condiciones del ambiente vegetal.
+
+Esta observación es consistente con lo descrito por Nobori et al. (2018), quienes demostraron que el transcriptoma de _P. syringae DC3000_ experimenta cambios durante su interacción con _A. thaliana_, evidenciando la importancia del ambiente del hospedero en la regulación de la expresión bacteriana [5]. Sin embargo, la separación observada entre condiciones mediante el análisis de componentes principales (PCA) no permite atribuir todas las diferencias exclusivamente al proceso de infección, ya que también pueden intervenir factores relacionados con las condiciones de cultivo, la variabilidad biológica y las características técnicas de las muestras.
+
+***Funciones biológicas asociadas con la adaptación al hospedero***
+
+Respecto a la segunda pregunta de investigación, el análisis de enriquecimiento funcional mediante KEGG permitió identificar procesos biológicos sobrerrepresentados entre los genes inducidos durante la infección, principalmente relacionados con la síntesis proteica, el metabolismo del carbono y la biosíntesis de metabolitos secundarios.
+El enriquecimiento de la ruta del ribosoma podría reflejar cambios en la demanda de síntesis proteica durante la interacción bacteria-hospedero. Por otra parte, la representación significativa de rutas como glucólisis/gluconeogénesis, metabolismo del carbono y ciclo del ácido cítrico sugiere modificaciones en la expresión de genes asociados con la utilización de nutrientes y el metabolismo energético.
+
+Estas observaciones son compatibles con los antecedentes descritos por Xin et al. (2018), quienes destacan que la capacidad de _P. syringae_ para colonizar el tejido vegetal depende, entre otros factores, de su adaptación a las condiciones fisiológicas y nutricionales del apoplasto [3]. Asimismo, el enriquecimiento de la biosíntesis de metabolitos secundarios podría relacionarse con cambios en procesos metabólicos relevantes para la fisiología bacteriana. No obstante, se requiere examinar los genes específicos asociados con esta ruta antes de proponer una relación directa con mecanismos de virulencia.
+
+Es importante considerar que el enriquecimiento estadístico de una ruta no demuestra necesariamente su activación funcional, ya que el análisis se basa en la representación de genes diferencialmente expresados y no en mediciones directas de actividad enzimática, abundancia proteica o flujo metabólico.
+
+***Genes con función desconocida y su posible relación con la patogenicidad***
+
+La tercera pregunta de investigación se abordó mediante la identificación de genes diferencialmente expresados cuya función se encuentra anotada como hipotética o poco caracterizada. Entre los candidatos identificados destacan genes como PSPTO2142, PSPTO1210, PSPTO1385 y PSPTO1372, que presentaron una mayor expresión durante la infección. Estos resultados permiten proponerlos como candidatos para estudios posteriores, aunque su patrón de expresión no constituye evidencia suficiente para atribuirles una función específica en la patogenicidad.
+
+Adicionalmente, el análisis del contexto genómico permitió examinar regiones que contienen genes relacionados con el sistema de secreción tipo III (T3SS), incluyendo efectores, proteínas estructurales y reguladores transcripcionales. Este sistema constituye uno de los principales mecanismos de virulencia de _P. syringae_, debido a su participación en la transferencia de proteínas efectoras hacia las células vegetales, como describen Buell et al. (2003) y Xin et al. (2018) [3,4].
+
+La proximidad genómica de genes hipotéticos a regiones asociadas con la virulencia puede proporcionar información complementaria para priorizar candidatos. Sin embargo, esta asociación debe interpretarse con precaución, puesto que la cercanía entre genes no demuestra que compartan regulación, función o participación directa en el proceso de infección.
+
+***Limitaciones e implicaciones del análisis***
+
+Los resultados dependen de la calidad de los datos públicos y de las anotaciones funcionales disponibles. Aunque la integración con GenBank y KEGG permitió ampliar la interpretación biológica, algunos genes carecen de funciones caracterizadas o de correspondencia con rutas conocidas, lo que limita su clasificación funcional. En conjunto, los resultados responden a las preguntas de investigación desde una perspectiva bioinformática: permiten identificar genes diferencialmente expresados, reconocer procesos biológicos enriquecidos y seleccionar genes poco caracterizados para investigaciones posteriores.
+
 
 ## 13. Conclusiones
 
-<!-- AYUDA: Sinteticen qué se aprendió, qué preguntas se respondieron y si se
-alcanzaron los objetivos. Incluyan aportes, limitaciones y trabajo futuro. No
-introduzcan resultados nuevos.
-EJEMPLO: El flujo permitió identificar..., pero será necesario incorporar... -->
+Con los resultados obtenidos del análisis de expresión diferencial y enriquecimiento funcional se cumplieron con los objetivos y preguntas de investigación.
 
-> Estado: pendiente. Se completará al finalizar el proyecto.
+A partir del análisis de expresión diferencial realizado con la herramienta Inmooose se encontraron 1458 genes, 830 inducidos y 628 reprimidos que responde a nuestra
+primera pregunta de investigación.
+
+Para conocer en que procesos estaba implicados, se realizó un enriquecimiento con KEGG  para asociar los genes cuyo patrón sea diferenciado del control con rutas biológicas, de los cuales solo 525 tenían anotación en la base de datos. Además, se encontraron 54 genes forman parte del Sistema de Secreción Tipo 3 (SST3), asociado a la patogenicidad, 
+lo que contesta nuestra segunda pregunta de investigación, donde en la infección a la planta existe una mayor inducción de genes asociados a 
+la patogenicidad. 
+
+Se obtuvieron genes candidatos que podrían estar asociados a la virulencia por su patrón de expresión. Especialmente al analizar la ubicación cromosómica de PSPTO1385, se encontró en una región cercana con el SST3 que representa un logfoldchange de 6.32, el gen sin anotación más inducido. Lo que responde a nuestra 
+tercera pregunta de investigación, sin embargo, es necesario realizar otros análisis en trabajos futuros para poder caracterizar de mejor manera su función 
+y comprobar que es un gen asociado a la patogénesis que por ahora únicamente se cataloga como candidato, por ejemplo se podría hacer un BLASTN para 
+conocer si tiene algún homólogo en otra cepa o bacteria y se podría elucidar su función o realizar una búsqueda más exhaustiva en otras bases de datos.
 
 
 ## 14. Disponibilidad, licencia y citación

@@ -45,8 +45,8 @@
     ],
     "codeRepository": "https://github.com/ItayetziC/Plant_pathogen_interaction.git",
     "dateCreated": "2026-08-25",
-    "dateModified": "2026-10-25",
-    "datePublished": "2026-10-20",
+    "dateModified": "2026-11-23",
+    "datePublished": "2026-11-23",
     "description": "Analisis transcriptomico diferencial en Python de Pseudomonas syringae pv. tomato DC3000 durante la infeccion de Arabidopsis thaliana. Integra datos publicos de RNA-seq (GEO GSE103441), analisis estadistico de expresion diferencial mediante InMoose, anotacion funcional (RefSeq GFC_000007805.1) y enriquecimiento de rutas biologicas con KEGG, así como herramientas de visualizacion para explorar los mecanismos moleculares asociados con la interaccion planta-patogeno.",
     "keywords": [
         "transcriptomica",
@@ -66,6 +66,6 @@
     "operatingSystem": "Windows",
     "programmingLanguage": "Python version 3.13",
     "relatedLink": "https://github.com/ItayetziC/Plant_pathogen_interaction/blob/main/README.md",
-    "version": "1.2.2",
+    "version": "3.3.3",
     "issueTracker": "https://github.com/ItayetziC/Plant_pathogen_interaction/issues"
 }

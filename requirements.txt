@@ -1,5 +1,10 @@
-biopython
-pandas
-numpy
-matplotlib
-jupyter
+# Dependencias del software y versiones utilizadas
+biopython      1.88
+inmoose        0.9.1
+pandas         2.3.3
+numpy          2.3.5
+scipy          1.16.3
+statsmodels    0.14.5
+matplotlib     3.10.6
+seaborn        0.13.2
+notebook       7.4.5

@@ -290,7 +290,7 @@ Plant_pathogen_interaction/
 ├── CITATION.cff     # Información para citar el software
 ├── LICENSE          # Licencia
 ├── README.md        # Introducción y guía rápida de uso
-├── codemeta.json	 # Metadata del software
+├── codemeta.json    # Metadata del software
 └── requirements.txt # Lista de librerías requeridas
 ```
 Para obtener los archivos no versionados: 
